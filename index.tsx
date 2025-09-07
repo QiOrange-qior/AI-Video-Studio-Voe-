@@ -72,7 +72,7 @@ async function getAllVideos(): Promise<VideoRecord[]> {
     const store = transaction.objectStore('videos');
     const request = store.getAll();
     request.onsuccess = (event) =>
-      resolve((event.target as IDBRequest).result.reverse()); // Show newest first
+      resolve((event.target as IDBRequest).result); 
     request.onerror = (event) =>
       reject('Error fetching videos: ' + (event.target as IDBRequest).error);
   });
@@ -223,6 +223,9 @@ const imageToVideoTab = document.querySelector(
 const imageUploadContainer = document.querySelector(
   '#image-upload-container'
 ) as HTMLDivElement;
+const imageUploadDivider = document.querySelector(
+  '#image-upload-divider'
+) as HTMLHRElement;
 const uploadInput = document.querySelector('#file-input') as HTMLInputElement;
 const imgPreview = document.querySelector('#img-preview') as HTMLImageElement;
 const styleButtons = document.querySelectorAll('.style-option');
@@ -240,6 +243,8 @@ const libraryGrid = document.querySelector('#library-grid') as HTMLDivElement;
 const libraryPlaceholder = document.querySelector(
   '.library-placeholder'
 ) as HTMLDivElement;
+const sortSelect = document.querySelector('#sort-select') as HTMLSelectElement;
+
 
 // API Key Modal
 const apiKeyModal = document.querySelector('#api-key-modal') as HTMLDivElement;
@@ -279,6 +284,8 @@ let selectedStylePrefix = '';
 let customStyleValue = '';
 let selectedAspectRatio = '16:9';
 let selectedMusicStyle = 'none';
+let currentSortOrder: 'newest' | 'oldest' | 'name' = 'newest';
+
 
 // --- API Key Modal ---
 function openApiKeyModal(errorMessage = '') {
@@ -378,7 +385,57 @@ async function createThumbnail(videoElement: HTMLVideoElement): Promise<Blob> {
 
 // --- Library Functions ---
 async function loadVideosFromLibrary() {
-  // Omitted for brevity...
+  const videos = await getAllVideos();
+
+  // Sort videos based on the current sort order
+  if (currentSortOrder === 'newest') {
+    videos.sort((a, b) => b.timestamp - a.timestamp);
+  } else if (currentSortOrder === 'oldest') {
+    videos.sort((a, b) => a.timestamp - b.timestamp);
+  } else if (currentSortOrder === 'name') {
+    videos.sort((a, b) => a.prompt.localeCompare(b.prompt));
+  }
+  
+  libraryGrid.innerHTML = ''; // Clear existing grid
+  
+  if (videos.length === 0) {
+    libraryPlaceholder.classList.remove('hidden');
+    libraryGrid.classList.add('hidden');
+  } else {
+    libraryPlaceholder.classList.add('hidden');
+    libraryGrid.classList.remove('hidden');
+
+    videos.forEach(videoRecord => {
+        const card = document.createElement('div');
+        card.className = 'library-card';
+        const thumbnailUrl = URL.createObjectURL(videoRecord.thumbnailBlob);
+
+        card.innerHTML = `
+            <div class="library-card-thumbnail">
+                <img src="${thumbnailUrl}" alt="Video thumbnail for prompt: ${videoRecord.prompt}">
+                <button class="play-button" aria-label="Play video"></button>
+            </div>
+            <div class="library-card-info">
+                <p class="library-card-prompt">${videoRecord.prompt}</p>
+                <span class="library-card-date">${new Date(videoRecord.timestamp).toLocaleDateString()}</span>
+            </div>
+        `;
+
+        card.querySelector('.play-button').addEventListener('click', () => {
+            const videoUrl = URL.createObjectURL(videoRecord.videoBlob);
+            // Simple playback: replace the main video player
+            showView('generate');
+            video.src = videoUrl;
+            video.style.display = 'block';
+            videoPlaceholder.classList.add('hidden');
+            downloadButton.classList.remove('hidden');
+            currentVideoURL = videoUrl;
+            statusEl.textContent = `Now playing: ${videoRecord.prompt}`;
+        });
+        
+        libraryGrid.appendChild(card);
+    });
+  }
 }
 
 // --- Event Listeners ---
@@ -395,10 +452,16 @@ navGenerate.addEventListener('click', () => showView('generate'));
 navTemplates.addEventListener('click', () => showView('templates'));
 navLibrary.addEventListener('click', () => showView('library'));
 
+sortSelect.addEventListener('change', () => {
+    currentSortOrder = sortSelect.value as 'newest' | 'oldest' | 'name';
+    loadVideosFromLibrary();
+});
+
 textToVideoTab.addEventListener('click', () => {
   textToVideoTab.classList.add('active');
   imageToVideoTab.classList.remove('active');
   imageUploadContainer.classList.add('hidden');
+  imageUploadDivider.classList.add('hidden');
   base64data = '';
   imgPreview.style.display = 'none';
   uploadInput.value = '';
@@ -408,6 +471,7 @@ imageToVideoTab.addEventListener('click', () => {
   imageToVideoTab.classList.add('active');
   textToVideoTab.classList.remove('active');
   imageUploadContainer.classList.remove('hidden');
+  imageUploadDivider.classList.remove('hidden');
 });
 
 uploadInput.addEventListener('change', async (e) => {
@@ -576,7 +640,14 @@ generateButton.addEventListener('click', async () => {
         statusEl.textContent = 'Video generated successfully.';
 
         // Generate thumbnail and save to library
-        // Omitted for brevity
+        const thumbnailBlob = await createThumbnail(video);
+        const videoRecord: VideoRecord = {
+          prompt: basePrompt,
+          videoBlob,
+          thumbnailBlob,
+          timestamp: Date.now(),
+        };
+        await addVideoToLibrary(videoRecord);
       },
       { once: true }
     );

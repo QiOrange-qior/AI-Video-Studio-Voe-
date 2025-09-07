@@ -11,6 +11,8 @@
   --error-color: #ff5252;
   --border-radius: 12px;
   --font-family: 'Segoe UI', system-ui, sans-serif;
+  --nebula-gradient: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  --nebula-glow: 0 0 12px rgba(0, 246, 255, 0.5);
 }
 
 * {
@@ -29,9 +31,14 @@
     to { opacity: 1; transform: scale(1); }
 }
 
-
 @keyframes spinner {
   to { transform: rotate(360deg); }
+}
+
+@keyframes subtlePulse {
+  0% { box-shadow: 0 0 20px rgba(0, 246, 255, 0.1), inset 0 0 15px rgba(0, 246, 255, 0.05); }
+  50% { box-shadow: 0 0 30px rgba(255, 0, 248, 0.15), inset 0 0 20px rgba(255, 0, 248, 0.05); }
+  100% { box-shadow: 0 0 20px rgba(0, 246, 255, 0.1), inset 0 0 15px rgba(0, 246, 255, 0.05); }
 }
 
 body {
@@ -99,11 +106,11 @@ header nav button:hover {
 }
 
 header nav button.active {
-  background-color: var(--primary-color);
-  color: #000;
-  border-color: var(--primary-color);
+  background-image: var(--nebula-gradient);
+  color: #fff;
+  border: 1px solid transparent;
   font-weight: 600;
-  box-shadow: 0 0 15px rgba(0, 246, 255, 0.3);
+  box-shadow: 0 0 8px rgba(0, 246, 255, 0.4);
 }
 
 #settings-button {
@@ -190,25 +197,29 @@ main > div {
   align-items: start;
 }
 
+/* New Unified Panel Styles */
 .controls-column {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.control-group {
-  background-color: var(--surface-color);
-  border: 1px solid var(--border-color-light);
-  border-radius: var(--border-radius);
-  padding: 24px;
-  transition: box-shadow 0.3s ease;
+.unified-panel {
+  background: rgba(26, 28, 44, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(58, 63, 88, 0.5);
+  border-radius: 16px;
+  padding: 8px 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
 }
 
-.control-group:focus-within {
-    box-shadow: 0 0 15px rgba(0, 246, 255, 0.1);
+.panel-section {
+    padding-top: 16px;
 }
 
-.control-group-header {
+.panel-section-header {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -216,10 +227,18 @@ main > div {
   color: var(--text-secondary-color);
 }
 
-.control-group-header h3 {
+.panel-section-header h3 {
     font-size: 1.1rem;
     color: var(--text-color);
 }
+
+.panel-divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border-color-light), transparent);
+  margin-top: 16px;
+}
+
 
 .card-select-group {
   display: flex;
@@ -278,13 +297,14 @@ main > div {
 .card-select-group input[type="radio"]:checked + .card-option {
   border-color: var(--primary-color);
   background-color: var(--surface-hover-color);
-  box-shadow: 0 0 15px rgba(0, 246, 255, 0.2);
+  box-shadow: var(--nebula-glow);
 }
 .card-select-group input[type="radio"]:checked + .card-option::before {
     border-color: var(--primary-color);
 }
 .card-select-group input[type="radio"]:checked + .card-option::after {
     transform: translateY(-50%) scale(1);
+    background: var(--nebula-gradient);
 }
 
 .card-header {
@@ -372,14 +392,16 @@ main > div {
 .style-option p {
   font-size: 0.9rem;
   color: var(--text-secondary-color);
+  transition: color 0.2s ease;
 }
 
 .style-option.active {
+  background-color: var(--surface-hover-color);
   border-color: var(--primary-color);
-  box-shadow: 0 0 15px rgba(0, 246, 255, 0.3);
+  box-shadow: var(--nebula-glow);
 }
-.style-option.active h4 {
-  color: var(--primary-color);
+.style-option.active h4, .style-option.active p {
+  color: var(--text-color);
 }
 
 textarea#prompt-input {
@@ -399,6 +421,7 @@ textarea#prompt-input:focus {
   outline: none;
   border-color: var(--primary-color);
   background-color: var(--surface-color);
+  box-shadow: 0 0 10px rgba(0, 246, 255, 0.3);
 }
 
 .settings-section {
@@ -441,7 +464,8 @@ textarea#prompt-input:focus {
 .format-option.active {
   background-color: var(--surface-hover-color);
   border-color: var(--primary-color);
-  color: var(--primary-color);
+  color: var(--text-color);
+  box-shadow: var(--nebula-glow);
 }
 .format-icon {
     background-color: var(--border-color);
@@ -451,6 +475,7 @@ textarea#prompt-input:focus {
 .format-icon.landscape { width: 48px; height: 27px; }
 .format-icon.portrait { width: 27px; height: 48px; }
 .format-icon.square { width: 40px; height: 40px; }
+
 .format-option.active .format-icon {
     background-color: var(--primary-color);
 }
@@ -478,7 +503,8 @@ textarea#prompt-input:focus {
 .music-option.active {
   background-color: var(--surface-hover-color);
   border-color: var(--primary-color);
-  color: var(--primary-color);
+  color: var(--text-color);
+  box-shadow: var(--nebula-glow);
 }
 
 .audio-toggle {
@@ -520,21 +546,21 @@ textarea#prompt-input:focus {
 }
 #audio-switch:checked + .switch-label {
   background-color: var(--primary-color);
-  box-shadow: 0 0 10px rgba(0, 246, 255, 0.4);
+  box-shadow: var(--nebula-glow);
+  border-color: transparent;
 }
 #audio-switch:checked + .switch-label .switch-button {
   transform: translateX(20px);
-  background-color: white;
+  background-color: var(--bg-color);
 }
 
 #generate-button {
   width: 100%;
-  margin-top: 24px;
   padding: 16px;
   font-size: 1.2rem;
   font-weight: 600;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-  color: #000;
+  background: var(--nebula-gradient);
+  color: #fff;
   border: none;
   border-radius: var(--border-radius);
   cursor: pointer;
@@ -545,7 +571,7 @@ textarea#prompt-input:focus {
   justify-content: center;
 }
 #generate-button:hover:not(:disabled) {
-  box-shadow: 0 0 20px rgba(0, 246, 255, 0.4), 0 0 20px rgba(255, 0, 248, 0.4);
+  box-shadow: var(--nebula-glow);
   transform: translateY(-2px);
 }
 #generate-button:disabled {
@@ -557,7 +583,7 @@ textarea#prompt-input:focus {
   display: none;
   width: 20px;
   height: 20px;
-  border: 2px solid #000;
+  border: 2px solid #fff;
   border-top-color: transparent;
   border-radius: 50%;
   animation: spinner 0.6s linear infinite;
@@ -583,6 +609,7 @@ textarea#prompt-input:focus {
   overflow: hidden;
   position: relative;
   border: 1px solid var(--border-color-light);
+  animation: subtlePulse 5s infinite ease-in-out;
 }
 
 #video-placeholder {
@@ -666,7 +693,8 @@ textarea#prompt-input:focus {
 #download-button:hover {
   background-color: var(--primary-color);
   color: var(--bg-color);
-  border-color: var(--primary-color);
+  border-color: transparent;
+  box-shadow: var(--nebula-glow);
 }
 
 #status {
@@ -798,30 +826,141 @@ textarea#prompt-input:focus {
   font-weight: 500;
   transition: all 0.2s ease;
   align-self: flex-start;
+  color: var(--text-color);
 }
 
 .template-card:hover .select-style-btn {
-  background-color: var(--primary-color);
-  color: #000;
+  background-color: var(--surface-hover-color);
+  color: var(--primary-color);
   border-color: var(--primary-color);
 }
 
 
 /* Library View */
+.library-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+.library-header h2 {
+    font-size: 1.8rem;
+}
+.sort-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-secondary-color);
+}
+#sort-select {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 8px 32px 8px 12px;
+    border-radius: var(--border-radius);
+    font-family: var(--font-family);
+    font-size: 1rem;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a0a0c0' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+#sort-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
 .library-placeholder {
   text-align: center;
   padding: 64px 24px;
   color: var(--text-secondary-color);
 }
-.library-placeholder h2 {
+.library-placeholder h3 {
   color: var(--text-color);
   margin: 16px 0 8px;
 }
 #library-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 24px;
 }
+
+.library-card {
+    background-color: var(--surface-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    border: 1px solid var(--border-color-light);
+    transition: all 0.3s ease;
+}
+.library-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    border-color: var(--border-color);
+}
+
+.library-card-thumbnail {
+    position: relative;
+    cursor: pointer;
+}
+.library-card-thumbnail img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+}
+.play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    width: 60px;
+    height: 60px;
+    background-color: rgba(13, 15, 23, 0.7);
+    backdrop-filter: blur(5px);
+    border: 2px solid white;
+    border-radius: 50%;
+    opacity: 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.play-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 53%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 18px solid white;
+}
+.library-card:hover .play-button {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.library-card-info {
+    padding: 16px;
+}
+.library-card-prompt {
+    font-weight: 500;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 2.4em; /* Approx 2 lines */
+}
+.library-card-date {
+    font-size: 0.9rem;
+    color: var(--text-secondary-color);
+}
+
 
 /* Modal */
 .modal-overlay {
@@ -876,6 +1015,7 @@ textarea#prompt-input:focus {
 .modal-content input:focus, .modal-content textarea:focus {
   outline: none;
   border-color: var(--primary-color);
+  box-shadow: 0 0 10px rgba(0, 246, 255, 0.3);
 }
 
 .modal-actions {
@@ -908,6 +1048,7 @@ textarea#prompt-input:focus {
 }
 #save-key-button:hover, #save-custom-prompt-button:hover {
     opacity: 0.9;
+    box-shadow: var(--nebula-glow);
 }
 
 .error-message {

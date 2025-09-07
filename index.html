@@ -133,156 +133,166 @@
 
         <div class="main-grid">
           <div class="controls-column">
-            <!-- AI Model Selection -->
-            <div class="control-group">
-              <div class="control-group-header">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L14.09 8.26L20 10.35L14.09 12.44L12 18.7L9.91 12.44L4 10.35L9.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <h3>AI Model</h3>
-              </div>
-              <div class="card-select-group">
-                <label>
-                  <input type="radio" name="ai-model" value="quality" />
-                  <div class="card-option">
-                    <div class="card-header">
-                      <h4>Veo Quality</h4>
-                      <span>~ 3-5 minutes</span>
+             <div class="unified-panel">
+                <!-- AI Model Section -->
+                <div class="panel-section">
+                  <div class="panel-section-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L14.09 8.26L20 10.35L14.09 12.44L12 18.7L9.91 12.44L4 10.35L9.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <h3>AI Model</h3>
+                  </div>
+                  <div class="card-select-group">
+                    <label>
+                      <input type="radio" name="ai-model" value="quality" />
+                      <div class="card-option">
+                        <div class="card-header">
+                          <h4>Veo Quality</h4>
+                          <span>~ 3-5 minutes</span>
+                        </div>
+                        <p>Highest quality with audio support</p>
+                        <div class="tags">
+                          <span>1080p support</span>
+                          <span>Audio generation</span>
+                          <span>Best quality</span>
+                        </div>
+                      </div>
+                    </label>
+                    <label>
+                      <input type="radio" name="ai-model" value="fast" checked />
+                      <div class="card-option">
+                        <div class="card-header">
+                          <h4>Veo Fast</h4>
+                          <span>~ 2-3 minutes</span>
+                        </div>
+                        <p>Faster generation with audio support</p>
+                        <div class="tags">
+                          <span>720p/1080p support</span>
+                          <span>Audio generation</span>
+                          <span>Faster processing</span>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                  <div class="tip-box">
+                    <p>
+                      <strong>Tip:</strong> Choose Veo for highest quality or
+                      Veo-fast for quicker results. All models support custom
+                      aspect ratios.
+                    </p>
+                  </div>
+                </div>
+
+                <hr class="panel-divider" />
+
+                <!-- Video Style Section -->
+                <div class="panel-section">
+                   <div class="panel-section-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.5 1.917a6.4 6.4 0 0 0-5.5 3.083 6.4 6.4 0 0 0-5.5-3.083A6.4 6.4 0 0 0 1 8.333a6.4 6.4 0 0 0 6.4 6.4 6.4 6.4 0 0 0 5.5-3.083 6.4 6.4 0 0 0 5.5 3.083 6.4 6.4 0 0 0 6.4-6.4A6.4 6.4 0 0 0 17.5 1.917z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <h3>Video Style</h3>
+                  </div>
+                  <div class="style-grid">
+                    <button class="style-option" data-style="Cinematic">
+                      <h4>Cinematic</h4>
+                      <p>Dramatic lighting & camera work</p>
+                    </button>
+                    <button class="style-option" data-style="Nature">
+                      <h4>Nature</h4>
+                      <p>Beautiful natural scenes</p>
+                    </button>
+                    <button class="style-option" data-style="Abstract">
+                      <h4>Abstract</h4>
+                      <p>Creative abstract visuals</p>
+                    </button>
+                    <button class="style-option" data-style="Portrait">
+                      <h4>Portrait</h4>
+                      <p>Character focused videos</p>
+                    </button>
+                    <button id="custom-prompt-button" class="style-option full-width active">
+                        <h4>Custom Prompt</h4>
+                        <p>Write your own description</p>
+                    </button>
+                  </div>
+                </div>
+
+                <hr id="image-upload-divider" class="panel-divider hidden" />
+
+                <!-- Image Upload Section -->
+                <div id="image-upload-container" class="panel-section hidden">
+                    <div class="panel-section-header">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <h3>Upload Image</h3>
                     </div>
-                    <p>Highest quality with audio support</p>
-                    <div class="tags">
-                      <span>1080p support</span>
-                      <span>Audio generation</span>
-                      <span>Best quality</span>
+                    <label for="file-input" class="file-label">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.2 15c.7-1.2 1-2.5.7-3.9-.2-1.2-.8-2.3-1.7-3.1-.9-.8-2-1.3-3.2-1.5-1.2-.2-2.5 0-3.6.6M12.5 5.5l-3-3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 14.5c.7 1.2 1 2.5.7 3.9-.2 1.2-.8 2.3-1.7 3.1-.9.8-2 1.3-3.2 1.5-1.2.2-2.5 0-3.6-.6M12 21.5l-3-3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 9 9 9 9 0 0 1-9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span>Click to upload or drag & drop</span>
+                        <small>PNG, JPG, WEBP (max 10MB)</small>
+                    </label>
+                    <input type="file" id="file-input" accept="image/*" />
+                    <img id="img-preview" src="#" alt="Image Preview" />
+                </div>
+                
+                <hr class="panel-divider" />
+
+                <!-- Video Description Section -->
+                <div class="panel-section">
+                  <div class="panel-section-header">
+                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                     <h3>Video Description</h3>
+                  </div>
+                  <textarea
+                    id="prompt-input"
+                    rows="5"
+                    placeholder="Describe the video you want to create..."
+                  ></textarea>
+                </div>
+                
+                <hr class="panel-divider" />
+
+                <!-- Settings Section -->
+                <div class="panel-section">
+                  <div class="panel-section-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.5.5 0 0 0 .11-.63l-1.8-3.12a.5.5 0 0 0-.61-.22l-2.39 1.02a7.6 7.6 0 0 0-1.64-.94l-.38-2.61a.5.5 0 0 0-.5-.44H9.74a.5.5 0 0 0-.5.44l-.38 2.61a7.6 7.6 0 0 0-1.64.94l-2.39-1.02a.5.5 0 0 0-.61.22l-1.8 3.12a.5.5 0 0 0 .11.63l2.03 1.58c-.05.3-.07.64-.07.94s.02.64.07.94l-2.03 1.58a.5.5 0 0 0-.11.63l1.8 3.12a.5.5 0 0 0 .61.22l2.39-1.02a7.6 7.6 0 0 0 1.64.94l.38 2.61a.5.5 0 0 0 .5.44h4.52a.5.5 0 0 0 .5-.44l.38-2.61a7.6 7.6 0 0 0 1.64-.94l2.39 1.02a.5.5 0 0 0 .61-.22l1.8-3.12a.5.5 0 0 0-.11-.63l-2.03-1.58zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="currentColor"/></svg>
+                    <h3>Settings</h3>
+                  </div>
+                  <div class="settings-section">
+                    <span class="label-heading">Video Format</span>
+                    <div class="format-select-group">
+                      <button class="format-option active" data-value="16:9">
+                        <div class="format-icon landscape"></div>
+                        <span>Landscape</span>
+                        <small>16:9</small>
+                      </button>
+                      <button class="format-option" data-value="9:16">
+                        <div class="format-icon portrait"></div>
+                        <span>Portrait</span>
+                        <small>9:16</small>
+                      </button>
+                       <button class="format-option" data-value="1:1">
+                        <div class="format-icon square"></div>
+                        <span>Square</span>
+                        <small>1:1</small>
+                      </button>
                     </div>
                   </div>
-                </label>
-                <label>
-                  <input type="radio" name="ai-model" value="fast" checked />
-                  <div class="card-option">
-                    <div class="card-header">
-                      <h4>Veo Fast</h4>
-                      <span>~ 2-3 minutes</span>
-                    </div>
-                    <p>Faster generation with audio support</p>
-                    <div class="tags">
-                      <span>720p/1080p support</span>
-                      <span>Audio generation</span>
-                      <span>Faster processing</span>
+
+                   <div class="settings-section">
+                    <span class="label-heading">Background Music</span>
+                    <div class="music-select-group">
+                      <button class="music-option active" data-music="none">None</button>
+                      <button class="music-option" data-music="cinematic">Cinematic</button>
+                      <button class="music-option" data-music="ambient">Ambient</button>
+                      <button class="music-option" data-music="electronic">Electronic</button>
+                      <button class="music-option" data-music="upbeat">Upbeat</button>
                     </div>
                   </div>
-                </label>
-              </div>
-              <div class="tip-box">
-                <p>
-                  <strong>Tip:</strong> Choose Veo for highest quality or
-                  Veo-fast for quicker results. All models support custom
-                  aspect ratios.
-                </p>
-              </div>
-            </div>
 
-            <!-- Video Style -->
-            <div class="control-group">
-              <div class="control-group-header">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.5 1.917a6.4 6.4 0 0 0-5.5 3.083 6.4 6.4 0 0 0-5.5-3.083A6.4 6.4 0 0 0 1 8.333a6.4 6.4 0 0 0 6.4 6.4 6.4 6.4 0 0 0 5.5-3.083 6.4 6.4 0 0 0 5.5 3.083 6.4 6.4 0 0 0 6.4-6.4A6.4 6.4 0 0 0 17.5 1.917z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <h3>Video Style</h3>
-              </div>
-              <div class="style-grid">
-                <button class="style-option" data-style="Cinematic">
-                  <h4>Cinematic</h4>
-                  <p>Dramatic lighting & camera work</p>
-                </button>
-                <button class="style-option" data-style="Nature">
-                  <h4>Nature</h4>
-                  <p>Beautiful natural scenes</p>
-                </button>
-                <button class="style-option" data-style="Abstract">
-                  <h4>Abstract</h4>
-                  <p>Creative abstract visuals</p>
-                </button>
-                <button class="style-option" data-style="Portrait">
-                  <h4>Portrait</h4>
-                  <p>Character focused videos</p>
-                </button>
-                <button id="custom-prompt-button" class="style-option full-width active">
-                    <h4>Custom Prompt</h4>
-                    <p>Write your own description</p>
-                </button>
-              </div>
-            </div>
-
-            <!-- Image Upload -->
-            <div id="image-upload-container" class="control-group hidden">
-                <div class="control-group-header">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <h3>Upload Image</h3>
+                   <div class="settings-section audio-toggle">
+                      <label for="audio-switch" class="label-heading">Generate Ambient Audio</label>
+                      <input type="checkbox" id="audio-switch" checked />
+                      <label for="audio-switch" class="switch-label">
+                        <span class="switch-button"></span>
+                      </label>
+                  </div>
                 </div>
-                <label for="file-input" class="file-label">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.2 15c.7-1.2 1-2.5.7-3.9-.2-1.2-.8-2.3-1.7-3.1-.9-.8-2-1.3-3.2-1.5-1.2-.2-2.5 0-3.6.6M12.5 5.5l-3-3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 14.5c.7 1.2 1 2.5.7 3.9-.2 1.2-.8 2.3-1.7 3.1-.9.8-2 1.3-3.2 1.5-1.2.2-2.5 0-3.6-.6M12 21.5l-3-3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 9 9 9 9 0 0 1-9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <span>Click to upload or drag & drop</span>
-                    <small>PNG, JPG, WEBP (max 10MB)</small>
-                </label>
-                <input type="file" id="file-input" accept="image/*" />
-                <img id="img-preview" src="#" alt="Image Preview" />
-            </div>
-            
-            <!-- Video Description -->
-            <div class="control-group">
-              <div class="control-group-header">
-                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                 <h3>Video Description</h3>
-              </div>
-              <textarea
-                id="prompt-input"
-                rows="5"
-                placeholder="Describe the video you want to create..."
-              ></textarea>
-            </div>
-
-            <!-- Settings -->
-            <div class="control-group">
-              <div class="control-group-header">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.5.5 0 0 0 .11-.63l-1.8-3.12a.5.5 0 0 0-.61-.22l-2.39 1.02a7.6 7.6 0 0 0-1.64-.94l-.38-2.61a.5.5 0 0 0-.5-.44H9.74a.5.5 0 0 0-.5.44l-.38 2.61a7.6 7.6 0 0 0-1.64.94l-2.39-1.02a.5.5 0 0 0-.61.22l-1.8 3.12a.5.5 0 0 0 .11.63l2.03 1.58c-.05.3-.07.64-.07.94s.02.64.07.94l-2.03 1.58a.5.5 0 0 0-.11.63l1.8 3.12a.5.5 0 0 0 .61.22l2.39-1.02a7.6 7.6 0 0 0 1.64.94l.38 2.61a.5.5 0 0 0 .5.44h4.52a.5.5 0 0 0 .5-.44l.38-2.61a7.6 7.6 0 0 0 1.64-.94l2.39 1.02a.5.5 0 0 0 .61-.22l1.8-3.12a.5.5 0 0 0-.11-.63l-2.03-1.58zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="currentColor"/></svg>
-                <h3>Settings</h3>
-              </div>
-              <div class="settings-section">
-                <span class="label-heading">Video Format</span>
-                <div class="format-select-group">
-                  <button class="format-option active" data-value="16:9">
-                    <div class="format-icon landscape"></div>
-                    <span>Landscape</span>
-                    <small>16:9</small>
-                  </button>
-                  <button class="format-option" data-value="9:16">
-                    <div class="format-icon portrait"></div>
-                    <span>Portrait</span>
-                    <small>9:16</small>
-                  </button>
-                   <button class="format-option" data-value="1:1">
-                    <div class="format-icon square"></div>
-                    <span>Square</span>
-                    <small>1:1</small>
-                  </button>
-                </div>
-              </div>
-
-               <div class="settings-section">
-                <span class="label-heading">Background Music</span>
-                <div class="music-select-group">
-                  <button class="music-option active" data-music="none">None</button>
-                  <button class="music-option" data-music="cinematic">Cinematic</button>
-                  <button class="music-option" data-music="ambient">Ambient</button>
-                  <button class="music-option" data-music="electronic">Electronic</button>
-                  <button class="music-option" data-music="upbeat">Upbeat</button>
-                </div>
-              </div>
-
-               <div class="settings-section audio-toggle">
-                  <label for="audio-switch" class="label-heading">Generate Ambient Audio</label>
-                  <input type="checkbox" id="audio-switch" checked />
-                  <label for="audio-switch" class="switch-label">
-                    <span class="switch-button"></span>
-                  </label>
-              </div>
             </div>
 
             <button id="generate-button">
@@ -374,7 +384,7 @@
            <!-- Template Cards -->
            <button class="template-card" data-style="Cinematic" data-music="cinematic">
              <div class="card-image">
-               <img src="https://storage.googleapis.com/gemini-ui-params/Veo/cinematic_template.jpg" alt="Cinematic style preview">
+               <img src="https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Cinematic style preview">
              </div>
              <div class="card-content">
                <h4>Cinematic Style</h4>
@@ -384,7 +394,7 @@
            </button>
            <button class="template-card" data-style="Nature" data-music="ambient">
              <div class="card-image">
-               <img src="https://storage.googleapis.com/gemini-ui-params/Veo/nature_template.jpg" alt="Nature style preview">
+               <img src="https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Nature style preview">
              </div>
              <div class="card-content">
                <h4>Nature Documentary</h4>
@@ -394,7 +404,7 @@
            </button>
            <button class="template-card" data-style="Abstract" data-music="electronic">
              <div class="card-image">
-               <img src="https://storage.googleapis.com/gemini-ui-params/Veo/abstract_template.jpg" alt="Abstract style preview">
+               <img src="https://images.pexels.com/photos/1287145/pexels-photo-1287145.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Abstract style preview">
              </div>
              <div class="card-content">
                <h4>Abstract Visuals</h4>
@@ -404,7 +414,7 @@
            </button>
             <button class="template-card" data-style="Portrait" data-music="ambient">
              <div class="card-image">
-                <img src="https://storage.googleapis.com/gemini-ui-params/Veo/portrait_template.jpg" alt="Portrait style preview">
+                <img src="https://images.pexels.com/photos/3779760/pexels-photo-3779760.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Portrait style preview">
              </div>
              <div class="card-content">
                <h4>Character Portrait</h4>
@@ -417,9 +427,20 @@
 
       <!-- Library View -->
       <div id="library-view" class="hidden">
-         <div class="library-placeholder">
+        <div class="library-header">
+            <h2>Your Video Library</h2>
+            <div class="sort-container">
+                <label for="sort-select">Sort by:</label>
+                <select id="sort-select">
+                    <option value="newest">Date: Newest First</option>
+                    <option value="oldest">Date: Oldest First</option>
+                    <option value="name">Name (A-Z)</option>
+                </select>
+            </div>
+        </div>
+        <div class="library-placeholder">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" stroke="var(--border-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <h2>Your Video Library</h2>
+              <h3>Your library is empty</h3>
               <p>Videos you generate will be saved here for easy access.</p>
               <p>Go to the Generator tab to create your first AI video.</p>
           </div>
