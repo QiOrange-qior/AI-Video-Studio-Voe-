@@ -228,6 +228,8 @@ const imgPreview = document.querySelector('#img-preview') as HTMLImageElement;
 const styleButtons = document.querySelectorAll('.style-option');
 const customPromptButton = document.querySelector('#custom-prompt-button') as HTMLButtonElement;
 const formatButtons = document.querySelectorAll('.format-option');
+const musicButtons = document.querySelectorAll('.music-option');
+const audioToggle = document.querySelector('.audio-toggle') as HTMLDivElement;
 const audioSwitch = document.querySelector('#audio-switch') as HTMLInputElement;
 
 // Templates View Controls
@@ -267,6 +269,7 @@ const allInputs: HTMLInputElement[] = [
   audioSwitch,
   ...Array.from(styleButtons),
   ...Array.from(formatButtons),
+  ...Array.from(musicButtons),
   ...Array.from(document.querySelectorAll('input[name="ai-model"]')),
 ] as any;
 
@@ -275,6 +278,7 @@ let currentVideoURL = '';
 let selectedStylePrefix = '';
 let customStyleValue = '';
 let selectedAspectRatio = '16:9';
+let selectedMusicStyle = 'none';
 
 // --- API Key Modal ---
 function openApiKeyModal(errorMessage = '') {
@@ -381,6 +385,7 @@ async function loadVideosFromLibrary() {
 document.addEventListener('DOMContentLoaded', () => {
   initDB();
   loadApiKey();
+  showView('templates'); // Start on templates view
   if (!geminiApiKey) {
     openApiKeyModal('Please enter your Gemini API key to start.');
   }
@@ -431,19 +436,65 @@ formatButtons.forEach((button) => {
   });
 });
 
+musicButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    setActiveButton(musicButtons, button);
+    selectedMusicStyle = (button as HTMLElement).dataset.music || 'none';
+
+    if (selectedMusicStyle !== 'none') {
+        audioSwitch.checked = true;
+        audioSwitch.disabled = true;
+        audioToggle.classList.add('disabled');
+    } else {
+        audioSwitch.disabled = false;
+        audioToggle.classList.remove('disabled');
+    }
+  });
+});
+
 templateCards.forEach((card) => {
   card.addEventListener('click', () => {
     const style = (card as HTMLElement).dataset.style;
-    const correspondingButton = document.querySelector(
+    const music = (card as HTMLElement).dataset.music || 'none';
+
+    // Set video style
+    const styleButton = document.querySelector(
       `.style-option[data-style="${style}"]`
     );
-    if (correspondingButton) {
-      setActiveButton(styleButtons, correspondingButton);
+    if (styleButton) {
+      setActiveButton(styleButtons, styleButton);
       selectedStylePrefix = style;
+      customStyleValue = '';
+    } else {
+      // Fallback to custom if no direct button match
+      setActiveButton(styleButtons, customPromptButton);
+      selectedStylePrefix = '';
+      customStyleValue = style;
     }
+    
+    // Set background music
+    selectedMusicStyle = music;
+    const musicButton = document.querySelector(
+        `.music-option[data-music="${music}"]`
+    );
+    if (musicButton) {
+        setActiveButton(musicButtons, musicButton);
+    }
+    
+    // Update audio toggle state based on music selection
+    if (selectedMusicStyle !== 'none') {
+        audioSwitch.checked = true;
+        audioSwitch.disabled = true;
+        audioToggle.classList.add('disabled');
+    } else {
+        audioSwitch.disabled = false;
+        audioToggle.classList.remove('disabled');
+    }
+
     showView('generate');
   });
 });
+
 
 generateButton.addEventListener('click', async () => {
   if (!geminiApiKey) {
@@ -474,15 +525,27 @@ generateButton.addEventListener('click', async () => {
 
   try {
     const finalStyle = customPromptButton.classList.contains('active') ? customStyleValue : selectedStylePrefix;
-    const fullPrompt = finalStyle ? `${finalStyle}, ${prompt}` : prompt;
+    let basePrompt = finalStyle ? `${finalStyle}, ${prompt}` : prompt;
+
+    const musicPromptMap: Record<string, string> = {
+        cinematic: 'with a dramatic, cinematic musical score',
+        ambient: 'with a calm, ambient soundtrack',
+        electronic: 'with an upbeat electronic music track',
+        upbeat: 'with an uplifting and upbeat music score',
+    };
+
+    if (selectedMusicStyle !== 'none' && musicPromptMap[selectedMusicStyle]) {
+        const musicDescription = musicPromptMap[selectedMusicStyle];
+        basePrompt = basePrompt ? `${basePrompt}, ${musicDescription}` : musicDescription;
+    }
 
     const params: VideoParams = {
       aspectRatio: selectedAspectRatio,
-      generateAudio: audioSwitch.checked,
+      generateAudio: selectedMusicStyle !== 'none' || audioSwitch.checked,
     };
 
     const videoBlob = await generateContent(
-      fullPrompt,
+      basePrompt,
       base64data,
       params,
       (percent) => {
@@ -543,9 +606,13 @@ generateButton.addEventListener('click', async () => {
         openApiKeyModal(friendlyMessage);
     }
   } finally {
-    // Re-enable UI
+    // Re-enable UI, respecting the music style lock
     generateButton.classList.remove('loading');
-    allInputs.forEach((el: any) => (el.disabled = false));
+    allInputs.forEach((el: any) => {
+        if (el.id !== 'audio-switch' || selectedMusicStyle === 'none') {
+             el.disabled = false
+        }
+    });
   }
 });
 

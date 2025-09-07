@@ -139,7 +139,7 @@ main > div {
 
 .main-header {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 48px;
 }
 
 .main-header h1 {
@@ -402,7 +402,10 @@ textarea#prompt-input:focus {
 }
 
 .settings-section {
-  margin-top: 16px;
+  margin-top: 24px;
+}
+.settings-section:first-child {
+  margin-top: 0;
 }
 
 .label-heading {
@@ -452,12 +455,48 @@ textarea#prompt-input:focus {
     background-color: var(--primary-color);
 }
 
+.music-select-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 12px;
+}
+
+.music-option {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color-light);
+  color: var(--text-secondary-color);
+  padding: 10px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+.music-option:hover {
+  background-color: var(--surface-hover-color);
+  transform: scale(1.05);
+}
+.music-option.active {
+  background-color: var(--surface-hover-color);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
 .audio-toggle {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 24px;
 }
+.audio-toggle.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.audio-toggle.disabled .label-heading {
+  cursor: not-allowed;
+}
+.audio-toggle.disabled .switch-label {
+  cursor: not-allowed;
+}
+
 #audio-switch { display: none; }
 .switch-label {
   position: relative;
@@ -638,6 +677,135 @@ textarea#prompt-input:focus {
 #status.error-message {
   color: var(--error-color);
 }
+
+/* Image Upload Styling */
+.file-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    border: 2px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    color: var(--text-secondary-color);
+    background-color: var(--bg-color);
+}
+.file-label:hover {
+    border-color: var(--primary-color);
+    background-color: var(--surface-hover-color);
+    transform: scale(1.02);
+}
+.file-label svg {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 12px;
+    color: var(--text-secondary-color);
+    transition: color 0.2s ease;
+}
+.file-label:hover svg {
+    color: var(--primary-color);
+}
+.file-label span {
+    font-weight: 500;
+    color: var(--text-color);
+}
+.file-label small {
+    margin-top: 8px;
+    font-size: 0.8rem;
+}
+#file-input {
+    display: none;
+}
+#img-preview {
+    margin-top: 16px;
+    max-width: 100%;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+/* Templates View */
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.template-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color-light);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  font-family: var(--font-family);
+  color: var(--text-color);
+}
+
+.template-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3), 0 0 20px rgba(0, 246, 255, 0.3);
+  border-color: var(--primary-color);
+}
+
+.card-image {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.template-card:hover .card-image img {
+  transform: scale(1.05);
+}
+
+.card-content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.card-content h4 {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.card-content p {
+  color: var(--text-secondary-color);
+  line-height: 1.6;
+  flex-grow: 1;
+  margin-bottom: 24px;
+}
+
+.select-style-btn {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.template-card:hover .select-style-btn {
+  background-color: var(--primary-color);
+  color: #000;
+  border-color: var(--primary-color);
+}
+
 
 /* Library View */
 .library-placeholder {

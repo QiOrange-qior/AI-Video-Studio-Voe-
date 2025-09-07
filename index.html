@@ -35,7 +35,7 @@
       </div>
       <div class="header-actions">
         <nav>
-          <button id="nav-generate" class="active">
+          <button id="nav-generate">
             <svg
               width="16"
               height="16"
@@ -53,7 +53,7 @@
             </svg>
             Generate
           </button>
-          <button id="nav-templates">
+          <button id="nav-templates" class="active">
             <svg
               width="16"
               height="16"
@@ -113,7 +113,7 @@
 
     <main>
       <!-- Generate View -->
-      <div id="generate-view">
+      <div id="generate-view" class="hidden">
         <div class="main-header">
           <h1>Create Amazing Videos with AI</h1>
           <p>
@@ -264,8 +264,20 @@
                   </button>
                 </div>
               </div>
+
+               <div class="settings-section">
+                <span class="label-heading">Background Music</span>
+                <div class="music-select-group">
+                  <button class="music-option active" data-music="none">None</button>
+                  <button class="music-option" data-music="cinematic">Cinematic</button>
+                  <button class="music-option" data-music="ambient">Ambient</button>
+                  <button class="music-option" data-music="electronic">Electronic</button>
+                  <button class="music-option" data-music="upbeat">Upbeat</button>
+                </div>
+              </div>
+
                <div class="settings-section audio-toggle">
-                  <label for="audio-switch" class="label-heading">Generate Audio</label>
+                  <label for="audio-switch" class="label-heading">Generate Ambient Audio</label>
                   <input type="checkbox" id="audio-switch" checked />
                   <label for="audio-switch" class="switch-label">
                     <span class="switch-button"></span>
@@ -353,13 +365,53 @@
       </div>
 
       <!-- Templates View -->
-      <div id="templates-view" class="hidden">
+      <div id="templates-view">
         <div class="main-header">
           <h1>Choose Your Video Style</h1>
           <p>Select a template to get started with professionally crafted video styles</p>
         </div>
         <div class="templates-grid">
            <!-- Template Cards -->
+           <button class="template-card" data-style="Cinematic" data-music="cinematic">
+             <div class="card-image">
+               <img src="https://storage.googleapis.com/gemini-ui-params/Veo/cinematic_template.jpg" alt="Cinematic style preview">
+             </div>
+             <div class="card-content">
+               <h4>Cinematic Style</h4>
+               <p>Film-like quality with dramatic lighting and sweeping camera movements. Includes a cinematic musical score.</p>
+               <span class="select-style-btn">Select Style</span>
+             </div>
+           </button>
+           <button class="template-card" data-style="Nature" data-music="ambient">
+             <div class="card-image">
+               <img src="https://storage.googleapis.com/gemini-ui-params/Veo/nature_template.jpg" alt="Nature style preview">
+             </div>
+             <div class="card-content">
+               <h4>Nature Documentary</h4>
+               <p>Breathtaking videos of natural landscapes and wildlife with stunning detail. Includes a calm, ambient soundtrack.</p>
+                <span class="select-style-btn">Select Style</span>
+             </div>
+           </button>
+           <button class="template-card" data-style="Abstract" data-music="electronic">
+             <div class="card-image">
+               <img src="https://storage.googleapis.com/gemini-ui-params/Veo/abstract_template.jpg" alt="Abstract style preview">
+             </div>
+             <div class="card-content">
+               <h4>Abstract Visuals</h4>
+               <p>Artistic videos focusing on color, shape, and form. Includes an upbeat electronic music track.</p>
+                <span class="select-style-btn">Select Style</span>
+             </div>
+           </button>
+            <button class="template-card" data-style="Portrait" data-music="ambient">
+             <div class="card-image">
+                <img src="https://storage.googleapis.com/gemini-ui-params/Veo/portrait_template.jpg" alt="Portrait style preview">
+             </div>
+             <div class="card-content">
+               <h4>Character Portrait</h4>
+               <p>Detailed and expressive character shots, perfect for compelling narratives. Includes a calm, ambient soundtrack.</p>
+                <span class="select-style-btn">Select Style</span>
+             </div>
+           </button>
         </div>
       </div>
 
