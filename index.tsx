@@ -280,13 +280,19 @@ let selectedAspectRatio = '16:9';
 function openApiKeyModal(errorMessage = '') {
   apiErrorEl.textContent = errorMessage;
   apiKeyModal.classList.remove('hidden');
-  apiKeyInput.focus();
+  setTimeout(() => { // Allow display property to apply before animating
+      apiKeyModal.classList.add('active');
+      apiKeyInput.focus();
+  }, 10);
 }
 
 function closeApiKeyModal() {
-  apiKeyModal.classList.add('hidden');
-  apiKeyInput.value = '';
-  apiErrorEl.textContent = '';
+  apiKeyModal.classList.remove('active');
+  setTimeout(() => {
+    apiKeyModal.classList.add('hidden');
+    apiKeyInput.value = '';
+    apiErrorEl.textContent = '';
+  }, 300); // Match animation duration
 }
 
 function loadApiKey() {
@@ -297,9 +303,17 @@ function loadApiKey() {
 function openCustomPromptModal() {
   customPromptInput.value = customStyleValue;
   customPromptModal.classList.remove('hidden');
+  setTimeout(() => {
+      customPromptModal.classList.add('active');
+      customPromptInput.focus(); // Good practice to focus the input
+  }, 10);
 }
+
 function closeCustomPromptModal() {
-  customPromptModal.classList.add('hidden');
+  customPromptModal.classList.remove('active');
+  setTimeout(() => {
+    customPromptModal.classList.add('hidden');
+  }, 300);
 }
 
 
@@ -309,29 +323,51 @@ function setActiveButton(buttons: NodeListOf<Element>, selectedButton: Element) 
   selectedButton.classList.add('active');
 }
 
-function showView(viewId: 'generate' | 'templates' | 'library') {
-  generateView.classList.add('hidden');
-  templatesView.classList.add('hidden');
-  libraryView.classList.add('hidden');
-  navGenerate.classList.remove('active');
-  navTemplates.classList.remove('active');
-  navLibrary.classList.remove('active');
+const views: Record<string, HTMLElement> = {
+  generate: generateView,
+  templates: templatesView,
+  library: libraryView,
+};
+let currentView: HTMLElement = generateView;
+const ANIMATION_DURATION = 300; // ms
 
-  switch (viewId) {
-    case 'generate':
-      generateView.classList.remove('hidden');
-      navGenerate.classList.add('active');
-      break;
-    case 'templates':
-      templatesView.classList.remove('hidden');
-      navTemplates.classList.add('active');
-      break;
-    case 'library':
-      libraryView.classList.remove('hidden');
-      navLibrary.classList.add('active');
-      loadVideosFromLibrary();
-      break;
-  }
+function showView(viewId: 'generate' | 'templates' | 'library') {
+    const nextView = views[viewId];
+    if (nextView === currentView || document.body.classList.contains('view-transitioning')) {
+        return;
+    }
+
+    // Update nav buttons
+    setActiveButton(document.querySelectorAll('header nav button'), document.querySelector(`#nav-${viewId}`));
+
+    document.body.classList.add('view-transitioning');
+
+    // Fade out current view
+    currentView.classList.add('fade-out');
+
+    setTimeout(() => {
+        currentView.classList.add('hidden');
+        currentView.classList.remove('fade-out');
+
+        // Fade in new view
+        nextView.classList.remove('hidden');
+        nextView.classList.add('fade-in');
+
+        // Update current view reference
+        currentView = nextView;
+
+        // Handle special logic for library view
+        if (viewId === 'library') {
+            loadVideosFromLibrary();
+        }
+
+        // Clean up classes after fade-in completes
+        setTimeout(() => {
+            currentView.classList.remove('fade-in');
+            document.body.classList.remove('view-transitioning');
+        }, ANIMATION_DURATION);
+
+    }, ANIMATION_DURATION);
 }
 
 async function createThumbnail(videoElement: HTMLVideoElement): Promise<Blob> {
