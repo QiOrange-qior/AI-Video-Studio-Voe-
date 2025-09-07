@@ -1,18 +1,19 @@
 :root {
-  --bg-color: #0d0f17;
-  --surface-color: #1a1c2c;
-  --surface-hover-color: #24273d;
-  --primary-color: #00f6ff;
-  --secondary-color: #ff00f8;
-  --text-color: #e0e0e0;
-  --text-secondary-color: #a0a0c0;
-  --border-color: #3a3f58;
-  --border-color-light: #2c314a;
-  --error-color: #ff5252;
+  --bg-color: #050812;
+  --surface-color: rgba(17, 24, 39, 0.5);
+  --surface-hover-color: rgba(31, 41, 55, 0.7);
+  --primary-color: #3b82f6;
+  --secondary-color: #8b5cf6;
+  --text-color: #f3f4f6;
+  --text-secondary-color: #9ca3af;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-color-light: rgba(255, 255, 255, 0.05);
+  --error-color: #ef4444;
   --border-radius: 12px;
-  --font-family: 'Segoe UI', system-ui, sans-serif;
-  --nebula-gradient: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-  --nebula-glow: 0 0 12px rgba(0, 246, 255, 0.5);
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --app-gradient: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+  --glow-shadow-primary: 0 0 12px rgba(59, 130, 246, 0.5), 0 0 24px rgba(59, 130, 246, 0.2);
+  --glow-shadow-secondary: 0 0 12px rgba(139, 92, 246, 0.5), 0 0 24px rgba(139, 92, 246, 0.2);
 }
 
 * {
@@ -35,18 +36,15 @@
   to { transform: rotate(360deg); }
 }
 
-@keyframes subtlePulse {
-  0% { box-shadow: 0 0 20px rgba(0, 246, 255, 0.1), inset 0 0 15px rgba(0, 246, 255, 0.05); }
-  50% { box-shadow: 0 0 30px rgba(255, 0, 248, 0.15), inset 0 0 20px rgba(255, 0, 248, 0.05); }
-  100% { box-shadow: 0 0 20px rgba(0, 246, 255, 0.1), inset 0 0 15px rgba(0, 246, 255, 0.05); }
-}
-
 body {
   font-family: var(--font-family);
   background-color: var(--bg-color);
   color: var(--text-color);
   margin: 0;
   padding: 0 32px;
+  background-image: radial-gradient(circle at top left, rgba(59, 130, 246, 0.1), transparent 35%),
+                    radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.1), transparent 35%);
+  background-attachment: fixed;
 }
 
 .hidden {
@@ -59,8 +57,13 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 24px 0;
-  border-bottom: 1px solid var(--border-color-light);
   margin-bottom: 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(5, 8, 18, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .logo {
@@ -81,40 +84,41 @@ header {
 header nav {
   display: flex;
   gap: 8px;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color-light);
+  border-radius: var(--border-radius);
+  padding: 6px;
 }
 
 header nav button {
   background-color: transparent;
-  border: 1px solid var(--border-color-light);
+  border: 1px solid transparent;
   color: var(--text-secondary-color);
-  padding: 10px 20px;
-  border-radius: var(--border-radius);
+  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
 header nav button:hover {
-  background-color: var(--surface-color);
+  background-color: var(--surface-hover-color);
   color: var(--text-color);
-  border-color: var(--border-color);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 header nav button.active {
-  background-image: var(--nebula-gradient);
+  background-image: var(--app-gradient);
   color: #fff;
-  border: 1px solid transparent;
   font-weight: 600;
-  box-shadow: 0 0 8px rgba(0, 246, 255, 0.4);
+  box-shadow: var(--glow-shadow-primary);
 }
 
 #settings-button {
-  background: none;
+  background: var(--surface-color);
   border: 1px solid var(--border-color-light);
   color: var(--text-secondary-color);
   width: 44px;
@@ -128,7 +132,7 @@ header nav button.active {
 }
 
 #settings-button:hover {
-  background-color: var(--surface-color);
+  background-color: var(--surface-hover-color);
   color: var(--primary-color);
   border-color: var(--primary-color);
   transform: rotate(15deg);
@@ -150,8 +154,13 @@ main > div {
 }
 
 .main-header h1 {
-  font-size: 2.8rem;
-  margin-bottom: 12px;
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  background-image: var(--app-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .main-header p {
@@ -167,6 +176,7 @@ main > div {
   gap: 12px;
   margin-bottom: 32px;
   background-color: var(--surface-color);
+  border: 1px solid var(--border-color-light);
   border-radius: var(--border-radius);
   padding: 6px;
   width: fit-content;
@@ -186,8 +196,8 @@ main > div {
   transition: all 0.3s;
 }
 .tab-button.active {
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  background-color: var(--primary-color);
+  color: #fff;
 }
 
 .main-grid {
@@ -197,7 +207,7 @@ main > div {
   align-items: start;
 }
 
-/* New Unified Panel Styles */
+/* Unified Panel Styles */
 .controls-column {
   display: flex;
   flex-direction: column;
@@ -205,10 +215,10 @@ main > div {
 }
 
 .unified-panel {
-  background: rgba(26, 28, 44, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(58, 63, 88, 0.5);
+  background: var(--surface-color);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 8px 24px 24px 24px;
   display: flex;
@@ -216,7 +226,7 @@ main > div {
 }
 
 .panel-section {
-    padding-top: 16px;
+    padding-top: 24px;
 }
 
 .panel-section-header {
@@ -229,13 +239,14 @@ main > div {
 
 .panel-section-header h3 {
     font-size: 1.1rem;
+    font-weight: 600;
     color: var(--text-color);
 }
 
 .panel-divider {
   border: none;
   height: 1px;
-  background: linear-gradient(to right, transparent, var(--border-color-light), transparent);
+  background: var(--border-color);
   margin-top: 16px;
 }
 
@@ -256,8 +267,8 @@ main > div {
 }
 
 .card-option {
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color-light);
+  background-color: rgba(0,0,0,0.2);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 16px;
   transition: all 0.2s ease;
@@ -265,7 +276,7 @@ main > div {
 }
 .card-select-group label:hover .card-option {
     border-color: var(--border-color);
-    transform: scale(1.02);
+    background-color: rgba(0,0,0,0.3);
 }
 
 .card-select-group input[type="radio"] + .card-option::before {
@@ -297,14 +308,14 @@ main > div {
 .card-select-group input[type="radio"]:checked + .card-option {
   border-color: var(--primary-color);
   background-color: var(--surface-hover-color);
-  box-shadow: var(--nebula-glow);
+  box-shadow: var(--glow-shadow-primary);
 }
 .card-select-group input[type="radio"]:checked + .card-option::before {
     border-color: var(--primary-color);
 }
 .card-select-group input[type="radio"]:checked + .card-option::after {
     transform: translateY(-50%) scale(1);
-    background: var(--nebula-gradient);
+    background: var(--app-gradient);
 }
 
 .card-header {
@@ -317,6 +328,7 @@ main > div {
 .card-header h4 {
   color: var(--text-color);
   font-size: 1rem;
+  font-weight: 500;
 }
 .card-header span {
   font-size: 0.8rem;
@@ -338,14 +350,15 @@ main > div {
   border-radius: 4px;
   font-size: 0.8rem;
   color: var(--text-secondary-color);
+  border: 1px solid var(--border-color-light);
 }
 
 .tip-box {
-  background-color: var(--bg-color);
+  background-color: rgba(0,0,0,0.2);
   border-radius: var(--border-radius);
   padding: 16px;
   margin-top: 16px;
-  border: 1px solid var(--border-color-light);
+  border: 1px solid var(--border-color);
 }
 .tip-box p {
   font-size: 0.9rem;
@@ -360,8 +373,8 @@ main > div {
 }
 
 .style-option {
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color-light);
+  background-color: rgba(0,0,0,0.2);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 16px;
   cursor: pointer;
@@ -379,7 +392,6 @@ main > div {
   background-color: var(--surface-hover-color);
   border-color: var(--border-color);
   transform: translateY(-4px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .style-option h4 {
@@ -387,6 +399,7 @@ main > div {
   margin-bottom: 4px;
   transition: color 0.2s ease;
   color: var(--text-color);
+  font-weight: 500;
 }
 
 .style-option p {
@@ -398,7 +411,7 @@ main > div {
 .style-option.active {
   background-color: var(--surface-hover-color);
   border-color: var(--primary-color);
-  box-shadow: var(--nebula-glow);
+  box-shadow: var(--glow-shadow-primary);
 }
 .style-option.active h4, .style-option.active p {
   color: var(--text-color);
@@ -406,8 +419,8 @@ main > div {
 
 textarea#prompt-input {
   width: 100%;
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color-light);
+  background-color: rgba(0,0,0,0.2);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 12px;
   color: var(--text-color);
@@ -421,7 +434,7 @@ textarea#prompt-input:focus {
   outline: none;
   border-color: var(--primary-color);
   background-color: var(--surface-color);
-  box-shadow: 0 0 10px rgba(0, 246, 255, 0.3);
+  box-shadow: var(--glow-shadow-primary);
 }
 
 .settings-section {
@@ -433,9 +446,10 @@ textarea#prompt-input:focus {
 
 .label-heading {
   font-weight: 500;
-  color: var(--text-secondary-color);
+  color: var(--text-color);
   margin-bottom: 12px;
   display: block;
+  font-size: 0.9rem;
 }
 
 .format-select-group {
@@ -445,8 +459,8 @@ textarea#prompt-input:focus {
 }
 
 .format-option {
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color-light);
+  background-color: rgba(0,0,0,0.2);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 12px;
   cursor: pointer;
@@ -465,7 +479,7 @@ textarea#prompt-input:focus {
   background-color: var(--surface-hover-color);
   border-color: var(--primary-color);
   color: var(--text-color);
-  box-shadow: var(--nebula-glow);
+  box-shadow: var(--glow-shadow-primary);
 }
 .format-icon {
     background-color: var(--border-color);
@@ -487,8 +501,8 @@ textarea#prompt-input:focus {
 }
 
 .music-option {
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color-light);
+  background-color: rgba(0,0,0,0.2);
+  border: 1px solid var(--border-color);
   color: var(--text-secondary-color);
   padding: 10px;
   border-radius: var(--border-radius);
@@ -504,7 +518,7 @@ textarea#prompt-input:focus {
   background-color: var(--surface-hover-color);
   border-color: var(--primary-color);
   color: var(--text-color);
-  box-shadow: var(--nebula-glow);
+  box-shadow: var(--glow-shadow-primary);
 }
 
 .audio-toggle {
@@ -546,7 +560,7 @@ textarea#prompt-input:focus {
 }
 #audio-switch:checked + .switch-label {
   background-color: var(--primary-color);
-  box-shadow: var(--nebula-glow);
+  box-shadow: var(--glow-shadow-primary);
   border-color: transparent;
 }
 #audio-switch:checked + .switch-label .switch-button {
@@ -559,7 +573,7 @@ textarea#prompt-input:focus {
   padding: 16px;
   font-size: 1.2rem;
   font-weight: 600;
-  background: var(--nebula-gradient);
+  background: var(--app-gradient);
   color: #fff;
   border: none;
   border-radius: var(--border-radius);
@@ -571,7 +585,7 @@ textarea#prompt-input:focus {
   justify-content: center;
 }
 #generate-button:hover:not(:disabled) {
-  box-shadow: var(--nebula-glow);
+  box-shadow: var(--glow-shadow-primary);
   transform: translateY(-2px);
 }
 #generate-button:disabled {
@@ -594,22 +608,22 @@ textarea#prompt-input:focus {
 /* Preview Column */
 .preview-column {
   position: sticky;
-  top: 32px;
+  top: 115px; /* header height + some margin */
   text-align: center;
 }
 
 #video-preview-container {
   width: 100%;
   aspect-ratio: 16 / 9;
-  background-color: var(--surface-color);
+  background-color: var(--bg-color);
   border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   position: relative;
-  border: 1px solid var(--border-color-light);
-  animation: subtlePulse 5s infinite ease-in-out;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
 #video-placeholder {
@@ -625,20 +639,23 @@ textarea#prompt-input:focus {
   width: 80%;
   position: relative;
 }
+
 @keyframes pulseGlow {
-  0% { box-shadow: 0 0 15px rgba(255, 0, 248, 0.2); }
-  50% { box-shadow: 0 0 25px rgba(0, 246, 255, 0.4); }
-  100% { box-shadow: 0 0 15px rgba(255, 0, 248, 0.2); }
+  0% { text-shadow: 0 0 5px rgba(139, 92, 246, 0.5); }
+  50% { text-shadow: 0 0 15px rgba(59, 130, 246, 0.7); }
+  100% { text-shadow: 0 0 5px rgba(139, 92, 246, 0.5); }
 }
+
 #placeholder-generating-state {
     padding: 24px;
     border-radius: var(--border-radius);
-    animation: pulseGlow 3s infinite ease-in-out;
 }
+
 #progress-percent {
   font-size: 2.5rem;
   font-weight: 700;
   color: var(--text-color);
+  animation: pulseGlow 3s infinite ease-in-out;
 }
 #progress-stage {
   margin-bottom: 24px;
@@ -647,10 +664,11 @@ textarea#prompt-input:focus {
 #progress-bar-container {
   width: 100%;
   height: 8px;
-  background-color: var(--bg-color);
+  background-color: rgba(0,0,0,0.3);
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 16px;
+  border: 1px solid var(--border-color-light);
 }
 
 @keyframes flow {
@@ -661,7 +679,7 @@ textarea#prompt-input:focus {
 #progress-bar {
   width: 0%;
   height: 100%;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--primary-color));
+  background: var(--app-gradient);
   background-size: 200% 100%;
   transition: width 0.5s ease-in-out;
   animation: flow 2s linear infinite;
@@ -694,7 +712,7 @@ textarea#prompt-input:focus {
   background-color: var(--primary-color);
   color: var(--bg-color);
   border-color: transparent;
-  box-shadow: var(--nebula-glow);
+  box-shadow: var(--glow-shadow-primary);
 }
 
 #status {
@@ -719,12 +737,11 @@ textarea#prompt-input:focus {
     transition: all 0.2s ease;
     text-align: center;
     color: var(--text-secondary-color);
-    background-color: var(--bg-color);
+    background-color: rgba(0,0,0,0.2);
 }
 .file-label:hover {
     border-color: var(--primary-color);
     background-color: var(--surface-hover-color);
-    transform: scale(1.02);
 }
 .file-label svg {
     width: 32px;
@@ -757,13 +774,15 @@ textarea#prompt-input:focus {
 /* Templates View */
 .templates-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 24px;
 }
 
 .template-card {
-  background-color: var(--surface-color);
-  border: 1px solid var(--border-color-light);
+  background: var(--surface-color);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   overflow: hidden;
   transition: all 0.3s ease;
@@ -777,7 +796,7 @@ textarea#prompt-input:focus {
 
 .template-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.3), 0 0 20px rgba(0, 246, 255, 0.3);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3), var(--glow-shadow-primary);
   border-color: var(--primary-color);
 }
 
@@ -818,7 +837,7 @@ textarea#prompt-input:focus {
 }
 
 .select-style-btn {
-  background-color: var(--bg-color);
+  background-color: var(--surface-hover-color);
   border: 1px solid var(--border-color);
   padding: 10px 16px;
   border-radius: 8px;
@@ -830,9 +849,10 @@ textarea#prompt-input:focus {
 }
 
 .template-card:hover .select-style-btn {
-  background-color: var(--surface-hover-color);
-  color: var(--primary-color);
+  background: var(--primary-color);
+  color: #fff;
   border-color: var(--primary-color);
+  box-shadow: var(--glow-shadow-primary);
 }
 
 
@@ -864,7 +884,7 @@ textarea#prompt-input:focus {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a0a0c0' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
 }
@@ -877,6 +897,9 @@ textarea#prompt-input:focus {
   text-align: center;
   padding: 64px 24px;
   color: var(--text-secondary-color);
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
 }
 .library-placeholder h3 {
   color: var(--text-color);
@@ -889,16 +912,16 @@ textarea#prompt-input:focus {
 }
 
 .library-card {
-    background-color: var(--surface-color);
+    background: var(--surface-color);
     border-radius: var(--border-radius);
     overflow: hidden;
-    border: 1px solid var(--border-color-light);
+    border: 1px solid var(--border-color);
     transition: all 0.3s ease;
 }
 .library-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-    border-color: var(--border-color);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3), var(--glow-shadow-secondary);
+    border-color: var(--secondary-color);
 }
 
 .library-card-thumbnail {
@@ -918,7 +941,7 @@ textarea#prompt-input:focus {
     transform: translate(-50%, -50%) scale(0.8);
     width: 60px;
     height: 60px;
-    background-color: rgba(13, 15, 23, 0.7);
+    background-color: rgba(5, 8, 18, 0.7);
     backdrop-filter: blur(5px);
     border: 2px solid white;
     border-radius: 50%;
@@ -966,8 +989,9 @@ textarea#prompt-input:focus {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(13, 15, 23, 0.8);
-  backdrop-filter: blur(5px);
+  background-color: rgba(5, 8, 18, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -975,16 +999,20 @@ textarea#prompt-input:focus {
   animation: fadeIn 0.3s ease;
 }
 .modal-content {
-  background-color: var(--surface-color);
+  background: var(--surface-color);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   padding: 32px;
   border-radius: var(--border-radius);
   width: 100%;
   max-width: 500px;
   border: 1px solid var(--border-color);
   animation: modalFadeIn 0.3s ease;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
 }
 .modal-content h3 {
   margin-bottom: 8px;
+  font-size: 1.5rem;
 }
 .modal-content p {
   color: var(--text-secondary-color);
@@ -994,6 +1022,7 @@ textarea#prompt-input:focus {
 .modal-content a {
   color: var(--primary-color);
   text-decoration: none;
+  font-weight: 500;
 }
 .modal-content a:hover {
   text-decoration: underline;
@@ -1015,7 +1044,7 @@ textarea#prompt-input:focus {
 .modal-content input:focus, .modal-content textarea:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 10px rgba(0, 246, 255, 0.3);
+  box-shadow: var(--glow-shadow-primary);
 }
 
 .modal-actions {
@@ -1029,7 +1058,7 @@ textarea#prompt-input:focus {
   font-size: 1rem;
   font-weight: 500;
   border: none;
-  border-radius: var(--border-radius);
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -1041,14 +1070,15 @@ textarea#prompt-input:focus {
 .modal-actions button.secondary:hover {
     background-color: var(--surface-hover-color);
     color: var(--text-color);
+    border-color: var(--border-color);
 }
 #save-key-button, #save-custom-prompt-button {
   background: var(--primary-color);
-  color: var(--bg-color);
+  color: #fff;
 }
 #save-key-button:hover, #save-custom-prompt-button:hover {
     opacity: 0.9;
-    box-shadow: var(--nebula-glow);
+    box-shadow: var(--glow-shadow-primary);
 }
 
 .error-message {
