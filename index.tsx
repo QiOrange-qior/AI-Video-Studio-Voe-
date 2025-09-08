@@ -7,8 +7,12 @@
 // Fix: Add DOM library reference to resolve TypeScript errors with browser APIs.
 /// <reference lib="dom" />
 
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Type } from '@google/genai';
 // Fix: Removed static FFmpeg imports to prevent app load failures. They are now imported dynamically.
+import '@tailwindcss/browser';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { App as VeoGalleryApp } from './Veo gallery/Veo gallery App.tsx';
 
 interface VideoParams {
   aspectRatio?: string;
@@ -23,7 +27,8 @@ interface VideoRecord {
   timestamp: number;
 }
 
-// Fix: Removed API key modal and related logic to adhere to the guideline of using process.env.API_KEY exclusively.
+// Global state for API key
+let apiKey: string | null = null;
 
 // --- IndexedDB ---
 let db: IDBDatabase;
@@ -127,10 +132,12 @@ async function generateContent(
   prompt: string,
   imageBytes: string,
   params: VideoParams,
-  onProgress: (percent: number) => void
+  onProgress: (percent: number, previewData?: string) => void
 ): Promise<Blob> {
-  // Fix: Use process.env.API_KEY as per the guidelines. Assume it is available.
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  if (!apiKey) {
+    throw new Error('API Key is not set. Please configure it in the settings.');
+  }
+  const ai = new GoogleGenAI({ apiKey: apiKey });
 
   const config: any = {
     model: 'veo-2.0-generate-001',
@@ -153,8 +160,18 @@ async function generateContent(
   let operation = await ai.models.generateVideos(config);
 
   while (!operation.done) {
-    const progress = Number((operation.metadata as any)?.progressPercent) || 0;
-    onProgress(progress);
+    const metadata = (operation.metadata as any);
+    const progress = Number(metadata?.progressPercent) || 0;
+    
+    // Assumed API structure for live preview
+    const previewBytes = metadata?.livePreview?.image?.imageBytes;
+    let previewDataUrl: string | undefined = undefined;
+    if (previewBytes) {
+      // Assuming JPEG format for preview, can be adjusted
+      previewDataUrl = `data:image/jpeg;base64,${previewBytes}`;
+    }
+
+    onProgress(progress, previewDataUrl);
     await delay(5000); // Poll every 5 seconds
     operation = await ai.operations.getVideosOperation({ operation });
   }
@@ -172,8 +189,7 @@ async function generateContent(
   }
 
   const firstVideo = videos[0];
-  // Fix: Use process.env.API_KEY as per the guidelines.
-  const url = `${firstVideo.video.uri}&key=${process.env.API_KEY}`;
+  const url = `${firstVideo.video.uri}&key=${apiKey}`;
   const res = await fetch(url);
   if (!res.ok) {
     const errorBody = await res.json();
@@ -188,9 +204,11 @@ async function generateContent(
 // --- DOM Elements ---
 let generateView: HTMLDivElement,
     templatesView: HTMLDivElement,
+    galleryView: HTMLDivElement,
     libraryView: HTMLDivElement,
     navGenerate: HTMLDivElement,
     navTemplates: HTMLDivElement,
+    navGallery: HTMLDivElement,
     navLibrary: HTMLDivElement,
     promptEl: HTMLTextAreaElement,
     statusEl: HTMLParagraphElement,
@@ -199,6 +217,9 @@ let generateView: HTMLDivElement,
     videoPlaceholder: HTMLDivElement,
     placeholderInitialState: HTMLDivElement,
     placeholderGeneratingState: HTMLDivElement,
+    livePreviewContainer: HTMLDivElement,
+    livePreviewImage: HTMLImageElement,
+    progressOverlay: HTMLDivElement,
     progressBar: HTMLDivElement,
     progressPercent: HTMLParagraphElement,
     progressStage: HTMLParagraphElement,
@@ -239,14 +260,28 @@ let generateView: HTMLDivElement,
     customPromptInput: HTMLTextAreaElement,
     saveCustomPromptButton: HTMLButtonElement,
     cancelCustomPromptButton: HTMLButtonElement,
-    allInputs: HTMLElement[];
+    allInputs: HTMLElement[],
+    settingsButton: HTMLButtonElement,
+    apiKeyModal: HTMLDivElement,
+    apiKeyInput: HTMLInputElement,
+    saveApiKeyButton: HTMLButtonElement,
+    cancelApiKeyButton: HTMLButtonElement,
+    ideaGeneratorTriggerButton: HTMLButtonElement,
+    ideaGeneratorModal: HTMLDivElement,
+    ideaThemeInput: HTMLInputElement,
+    generateIdeasButton: HTMLButtonElement,
+    ideaResultsContainer: HTMLDivElement,
+    cancelIdeaModalButton: HTMLButtonElement;
+
 
 function initializeDOMElements() {
     generateView = document.querySelector('#generate-view') as HTMLDivElement;
     templatesView = document.querySelector('#templates-view') as HTMLDivElement;
+    galleryView = document.querySelector('#gallery-view') as HTMLDivElement;
     libraryView = document.querySelector('#library-view') as HTMLDivElement;
     navGenerate = document.querySelector('#nav-generate') as HTMLDivElement;
     navTemplates = document.querySelector('#nav-templates') as HTMLDivElement;
+    navGallery = document.querySelector('#nav-gallery') as HTMLDivElement;
     navLibrary = document.querySelector('#nav-library') as HTMLDivElement;
     promptEl = document.querySelector('#prompt-input') as HTMLTextAreaElement;
     statusEl = document.querySelector('#status') as HTMLParagraphElement;
@@ -255,6 +290,9 @@ function initializeDOMElements() {
     videoPlaceholder = document.querySelector('#video-placeholder') as HTMLDivElement;
     placeholderInitialState = document.querySelector('#placeholder-initial-state') as HTMLDivElement;
     placeholderGeneratingState = document.querySelector('#placeholder-generating-state') as HTMLDivElement;
+    livePreviewContainer = document.querySelector('#live-preview-container') as HTMLDivElement;
+    livePreviewImage = document.querySelector('#live-preview-image') as HTMLImageElement;
+    progressOverlay = document.querySelector('#progress-overlay') as HTMLDivElement;
     progressBar = document.querySelector('#progress-bar') as HTMLDivElement;
     progressPercent = document.querySelector('#progress-percent') as HTMLParagraphElement;
     progressStage = document.querySelector('#progress-stage') as HTMLParagraphElement;
@@ -296,6 +334,17 @@ function initializeDOMElements() {
     customPromptInput = document.querySelector('#custom-prompt-input') as HTMLTextAreaElement;
     saveCustomPromptButton = document.querySelector('#save-custom-prompt-button') as HTMLButtonElement;
     cancelCustomPromptButton = document.querySelector('#cancel-custom-prompt-button') as HTMLButtonElement;
+    settingsButton = document.querySelector('#settings-button') as HTMLButtonElement;
+    apiKeyModal = document.querySelector('#api-key-modal') as HTMLDivElement;
+    apiKeyInput = document.querySelector('#api-key-input') as HTMLInputElement;
+    saveApiKeyButton = document.querySelector('#save-api-key-button') as HTMLButtonElement;
+    cancelApiKeyButton = document.querySelector('#cancel-api-key-button') as HTMLButtonElement;
+    ideaGeneratorTriggerButton = document.querySelector('#get-ideas-button') as HTMLButtonElement;
+    ideaGeneratorModal = document.querySelector('#idea-generator-modal') as HTMLDivElement;
+    ideaThemeInput = document.querySelector('#idea-theme-input') as HTMLInputElement;
+    generateIdeasButton = document.querySelector('#generate-ideas-button') as HTMLButtonElement;
+    ideaResultsContainer = document.querySelector('#idea-results-container') as HTMLDivElement;
+    cancelIdeaModalButton = document.querySelector('#cancel-idea-modal-button') as HTMLButtonElement;
     
     // Fix: Added generic <HTMLElement> to querySelectorAll to ensure type compatibility with allInputs array.
     allInputs = [
@@ -305,6 +354,7 @@ function initializeDOMElements() {
       audioSwitch,
       navGenerate,
       navTemplates,
+      navGallery,
       navLibrary,
       textToVideoTab,
       imageToVideoTab,
@@ -326,8 +376,75 @@ let currentSortOrder: 'newest' | 'oldest' | 'name' = 'newest';
 let ffmpeg: any | null = null;
 let trimmerInitialized = false;
 
+// --- API Key Management ---
+function openApiKeyModal(isInitialSetup = false) {
+    if (!apiKeyModal || !cancelApiKeyButton) return;
+    apiKeyModal.classList.remove('hidden');
+    // Hide cancel button if it's the first time, forcing user to enter a key
+    if (isInitialSetup) {
+        cancelApiKeyButton.classList.add('hidden');
+    } else {
+        cancelApiKeyButton.classList.remove('hidden');
+    }
+}
 
-// Fix: Removed API key modal functions as per guidelines.
+function closeApiKeyModal() {
+    if (apiKeyModal) apiKeyModal.classList.add('hidden');
+}
+
+function saveApiKey() {
+    if (!apiKeyInput) return;
+    const key = apiKeyInput.value.trim();
+    if (key) {
+        apiKey = key;
+        localStorage.setItem('gemini-api-key', key);
+        closeApiKeyModal();
+        if (statusEl) {
+            statusEl.textContent = 'API Key saved successfully.';
+            statusEl.classList.remove('error-message');
+            setTimeout(() => {
+              if (statusEl && statusEl.textContent === 'API Key saved successfully.') {
+                statusEl.textContent = '';
+              }
+            }, 3000);
+        }
+    } else {
+       if (statusEl) {
+           statusEl.textContent = 'Please enter a valid API key.';
+           statusEl.classList.add('error-message');
+       }
+    }
+}
+
+function loadApiKey() {
+    // Prioritize user-set key from local storage.
+    const storedKey = localStorage.getItem('gemini-api-key');
+    if (storedKey && storedKey.trim()) {
+        apiKey = storedKey;
+        return;
+    }
+    
+    // Fallback to environment variable if no key is in local storage.
+    let envKey: string | undefined;
+    try {
+        // This check prevents errors in browsers where 'process' is not defined.
+        if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+            envKey = process.env.API_KEY;
+        }
+    } catch (e) {
+        // In some sandboxed or unusual environments, accessing process can throw.
+        console.warn('Could not access process.env. API key may need to be set manually.');
+    }
+
+    // FIX: Check if the environment key is not just whitespace.
+    // If an empty key is silently used, the app appears broken and doesn't prompt for a key.
+    if (envKey && envKey.trim()) {
+        apiKey = envKey;
+    } else {
+        // If no valid key is found from local storage or environment, prompt the user.
+        openApiKeyModal(true); // isInitialSetup = true
+    }
+}
 
 // --- Custom Prompt Modal ---
 function openCustomPromptModal() {
@@ -339,6 +456,14 @@ function closeCustomPromptModal() {
   if (customPromptModal) customPromptModal.classList.add('hidden');
 }
 
+// --- Idea Generator Modal ---
+function openIdeaGeneratorModal() {
+  if (ideaGeneratorModal) ideaGeneratorModal.classList.remove('hidden');
+}
+function closeIdeaGeneratorModal() {
+  if (ideaGeneratorModal) ideaGeneratorModal.classList.add('hidden');
+}
+
 
 // --- Helper Functions ---
 function setActiveButton(buttons: NodeListOf<Element>, selectedButton: Element) {
@@ -346,14 +471,16 @@ function setActiveButton(buttons: NodeListOf<Element>, selectedButton: Element) 
   selectedButton.classList.add('active');
 }
 
-function showView(viewId: 'generate' | 'templates' | 'library') {
-  if (!generateView || !templatesView || !libraryView || !navGenerate || !navTemplates || !navLibrary) return;
+function showView(viewId: 'generate' | 'templates' | 'gallery' | 'library') {
+  if (!generateView || !templatesView || !galleryView || !libraryView || !navGenerate || !navTemplates || !navGallery || !navLibrary) return;
 
   generateView.classList.add('hidden');
   templatesView.classList.add('hidden');
+  galleryView.classList.add('hidden');
   libraryView.classList.add('hidden');
   navGenerate.classList.remove('active');
   navTemplates.classList.remove('active');
+  navGallery.classList.remove('active');
   navLibrary.classList.remove('active');
 
   switch (viewId) {
@@ -364,6 +491,11 @@ function showView(viewId: 'generate' | 'templates' | 'library') {
     case 'templates':
       templatesView.classList.remove('hidden');
       navTemplates.classList.add('active');
+      break;
+    case 'gallery':
+      galleryView.classList.remove('hidden');
+      navGallery.classList.add('active');
+      initializeVeoGalleryApp();
       break;
     case 'library':
       libraryView.classList.remove('hidden');
@@ -410,6 +542,28 @@ async function createThumbnail(videoElement: HTMLVideoElement): Promise<Blob> {
     }
   });
 }
+
+// --- Veo Gallery Showcase ---
+let galleryInitialized = false;
+function initializeVeoGalleryApp() {
+    if (galleryInitialized) return;
+
+    const galleryRoot = document.getElementById('veo-gallery-root');
+    if (galleryRoot) {
+        const root = ReactDOM.createRoot(galleryRoot);
+        const galleryProps = {
+          getApiKey: () => apiKey,
+          openApiKeyModal: () => openApiKeyModal(false)
+        };
+        root.render(
+            React.createElement(React.StrictMode, null, React.createElement(VeoGalleryApp, galleryProps))
+        );
+        galleryInitialized = true;
+    } else {
+        console.error('Could not find root element for Veo Gallery App.');
+    }
+}
+
 
 // --- Library Functions ---
 async function loadVideosFromLibrary() {
@@ -592,11 +746,12 @@ function initializeTrimmer() {
 document.addEventListener('DOMContentLoaded', () => {
   initializeDOMElements();
   initDB();
-  // Fix: Removed API key loading and modal logic as per guidelines.
-  showView('templates'); // Start on templates view
+  loadApiKey();
+  showView('generate'); // Start on generate view
 
   if (navGenerate) navGenerate.addEventListener('click', () => showView('generate'));
   if (navTemplates) navTemplates.addEventListener('click', () => showView('templates'));
+  if (navGallery) navGallery.addEventListener('click', () => showView('gallery'));
   if (navLibrary) navLibrary.addEventListener('click', () => showView('library'));
 
   if (sortSelect) {
@@ -732,7 +887,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (generateButton) {
     generateButton.addEventListener('click', async () => {
-      // Fix: Removed API key check as per guidelines.
+      if (!apiKey) {
+        if (statusEl) statusEl.textContent = 'Please configure your API Key first.';
+        openApiKeyModal(true);
+        return;
+      }
       const prompt = promptEl?.value.trim();
       if ((!prompt && !base64data) || !statusEl) {
         if (statusEl) statusEl.textContent = 'Please enter a video description or upload an image.';
@@ -759,6 +918,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if(videoPlaceholder) videoPlaceholder.classList.remove('hidden');
       if(placeholderInitialState) placeholderInitialState.classList.add('hidden');
       if(placeholderGeneratingState) placeholderGeneratingState.classList.remove('hidden');
+      if(livePreviewContainer) livePreviewContainer.classList.remove('visible');
+      if(livePreviewImage) livePreviewImage.src = '';
+      if(progressOverlay) progressOverlay.classList.remove('preview-active');
       if(progressBar) progressBar.style.width = '0%';
       if(progressPercent) progressPercent.textContent = '0%';
       if(progressStage) progressStage.textContent = 'Initializing...';
@@ -790,9 +952,17 @@ document.addEventListener('DOMContentLoaded', () => {
           basePrompt,
           base64data,
           params,
-          (percent) => {
+          (percent, previewData) => {
             if (progressBar) progressBar.style.width = `${percent}%`;
             if (progressPercent) progressPercent.textContent = `${percent.toFixed(0)}%`;
+
+            if (previewData && livePreviewImage && livePreviewContainer && progressOverlay) {
+                if (!livePreviewContainer.classList.contains('visible')) {
+                    livePreviewContainer.classList.add('visible');
+                    progressOverlay.classList.add('preview-active');
+                }
+                livePreviewImage.src = previewData;
+            }
 
             if (progressStage) {
               if (percent < 10) {
@@ -840,16 +1010,22 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) {
         let friendlyMessage = 'An unknown error occurred. Please try again.';
         const rawMessage = (err as Error).message || '';
+        const lowerCaseMessage = rawMessage.toLowerCase();
 
-        if (rawMessage.includes('quota')) {
+        if (lowerCaseMessage.includes('api key') && (lowerCaseMessage.includes('not valid') || lowerCaseMessage.includes('invalid'))) {
+            friendlyMessage = 'Your API Key is not valid. Please check it in the settings.';
+            openApiKeyModal();
+        } else if (lowerCaseMessage.includes('quota')) {
             friendlyMessage = 'You have exceeded your API quota. Please check your plan and billing details.';
         } else {
             try {
+                // Attempt to parse if the message is a JSON string
                 const errorJson = JSON.parse(rawMessage);
                 if (errorJson.error && errorJson.error.message) {
                     friendlyMessage = errorJson.error.message;
                 }
             } catch (e) {
+                // If parsing fails, use the raw message
                 friendlyMessage = rawMessage;
             }
         }
@@ -976,6 +1152,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // API Key Modal Listeners
+  if (settingsButton) settingsButton.addEventListener('click', () => openApiKeyModal(false));
+  if (saveApiKeyButton) saveApiKeyButton.addEventListener('click', saveApiKey);
+  if (cancelApiKeyButton) cancelApiKeyButton.addEventListener('click', closeApiKeyModal);
+  if (apiKeyModal) {
+    apiKeyModal.addEventListener('click', (e) => {
+      // Close modal if overlay is clicked, but not if content is clicked
+      if (e.target === apiKeyModal && !cancelApiKeyButton.classList.contains('hidden')) {
+        closeApiKeyModal();
+      }
+    });
+    const modalContent = apiKeyModal.querySelector('.modal-content');
+    if (modalContent) {
+      modalContent.addEventListener('click', (e) => e.stopPropagation());
+    }
+  }
+
   // Custom Prompt Modal Listeners
   if (saveCustomPromptButton) {
     saveCustomPromptButton.addEventListener('click', () => {
@@ -1002,8 +1195,107 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Idea Generator Modal Listeners
+  if (ideaGeneratorTriggerButton) {
+    ideaGeneratorTriggerButton.addEventListener('click', openIdeaGeneratorModal);
+  }
+  if (cancelIdeaModalButton) {
+    cancelIdeaModalButton.addEventListener('click', closeIdeaGeneratorModal);
+  }
+  if (ideaGeneratorModal) {
+    ideaGeneratorModal.addEventListener('click', (e) => {
+      if (e.target === ideaGeneratorModal) closeIdeaGeneratorModal();
+    });
+    const modalContent = ideaGeneratorModal.querySelector('.modal-content');
+    if (modalContent) {
+      modalContent.addEventListener('click', (e) => e.stopPropagation());
+    }
+  }
+  if (generateIdeasButton) {
+    generateIdeasButton.addEventListener('click', async () => {
+        const theme = ideaThemeInput.value.trim();
+        if (!theme) {
+            if (statusEl) {
+              statusEl.textContent = 'Please enter a theme or keyword.';
+              statusEl.classList.add('error-message');
+            }
+            return;
+        }
+        if (!apiKey) {
+            if (statusEl) statusEl.textContent = 'Please configure your API Key first.';
+            openApiKeyModal(true);
+            return;
+        }
+
+        generateIdeasButton.classList.add('loading');
+        generateIdeasButton.disabled = true;
+        ideaResultsContainer.innerHTML = '<div class="spinner-container"><div class="spinner"></div></div>'; // Show a spinner in results
+
+        try {
+            const ai = new GoogleGenAI({ apiKey });
+            const prompt = `You are a creative assistant for a video generation app. Based on the theme "${theme}", generate 3 short, creative video prompt ideas. The ideas should be visually descriptive and inspiring.`;
+
+            const response = await ai.models.generateContent({
+               model: "gemini-2.5-flash",
+               contents: prompt,
+               config: {
+                 responseMimeType: "application/json",
+                 responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                      ideas: {
+                        type: Type.ARRAY,
+                        items: {
+                          type: Type.STRING,
+                          description: 'A creative video prompt idea.'
+                        }
+                      }
+                    }
+                  },
+               },
+            });
+
+            ideaResultsContainer.innerHTML = ''; // Clear spinner
+
+            const result = JSON.parse(response.text);
+            if (result.ideas && result.ideas.length > 0) {
+                result.ideas.forEach((idea: string) => {
+                    const card = document.createElement('div');
+                    card.className = 'idea-card';
+                    card.textContent = idea;
+                    card.tabIndex = 0; // Make it focusable
+                    card.setAttribute('role', 'button');
+
+                    card.addEventListener('click', () => {
+                        if (promptEl) promptEl.value = idea;
+                        closeIdeaGeneratorModal();
+                    });
+
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            card.click();
+                        }
+                    });
+
+                    ideaResultsContainer.appendChild(card);
+                });
+            } else {
+               ideaResultsContainer.textContent = 'No ideas generated. Try a different theme.';
+            }
+
+        } catch (err) {
+            console.error(err);
+            ideaResultsContainer.innerHTML = `<p class="error-message" style="text-align: center; padding: 1rem;">Could not generate ideas. ${(err as Error).message}</p>`;
+        } finally {
+            generateIdeasButton.classList.remove('loading');
+            generateIdeasButton.disabled = false;
+        }
+    });
+  }
+
   // Add keyboard accessibility to div 'buttons'
-  const clickableDivs = document.querySelectorAll<HTMLDivElement>('#nav-generate, #nav-templates, #nav-library, .tab-button, .template-card, .style-option, .format-option, .music-option');
+  const clickableDivs = document.querySelectorAll<HTMLDivElement>('#nav-generate, #nav-templates, #nav-gallery, #nav-library, .tab-button, .template-card, .style-option, .format-option, .music-option');
   clickableDivs.forEach(div => {
       div.addEventListener('keydown', (e: KeyboardEvent) => {
           if (e.key === 'Enter' || e.key === ' ') {

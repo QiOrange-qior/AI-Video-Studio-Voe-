@@ -6,41 +6,43 @@
     <title>AI Video Studio</title>
     <link rel="stylesheet" href="index.css" />
     <script type="importmap">
-      {
-        "imports": {
-          "@google/genai": "https://esm.sh/@google/genai@^1.4.0",
-          "@ffmpeg/ffmpeg": "https://esm.sh/@ffmpeg/ffmpeg@0.12.10/dist/esm/ffmpeg.js",
-          "@ffmpeg/util": "https://esm.sh/@ffmpeg/util@0.12.1/dist/esm/index.js"
-        }
-      }
-    </script>
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.4.0",
+    "@ffmpeg/ffmpeg": "https://esm.sh/@ffmpeg/ffmpeg@0.12.10/dist/esm/ffmpeg.js",
+    "@ffmpeg/util": "https://esm.sh/@ffmpeg/util@0.12.1/dist/esm/index.js",
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "@tailwindcss/browser": "https://esm.sh/@tailwindcss/browser@^4.1.10",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "path": "https://aistudiocdn.com/path@^0.12.7",
+    "vite": "https://aistudiocdn.com/vite@^7.1.4"
+  }
+}
+</script>
+    <script type="module" src="index.tsx"></script>
   </head>
   <body>
     <header>
       <div class="logo">
-        <svg
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-            stroke="var(--primary-color)"
-            stroke-width="1.5"
-          />
-          <path
-            d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z"
-            stroke="var(--secondary-color)"
-            stroke-width="1.5"
-          />
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#8B5CF6"></stop>
+              <stop offset="100%" stop-color="#3B82F6"></stop>
+            </linearGradient>
+          </defs>
+          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="url(#logo-gradient)" stroke-width="2"></path>
+          <path d="M9.5 16V8L16.5 12L9.5 16Z" fill="url(#logo-gradient)"></path>
+          <!-- AI Sparkle -->
+          <path d="M19 2.5L19.5 4L21 4.5L19.5 5L19 6.5L18.5 5L17 4.5L18.5 4L19 2.5Z" fill="white"></path>
         </svg>
         <span>AI Video Studio</span>
       </div>
       <div class="header-actions">
         <nav>
-          <div role="button" tabindex="0" id="nav-generate">
+          <div role="button" tabindex="0" id="nav-generate" class="active">
             <svg
               width="16"
               height="16"
@@ -58,7 +60,7 @@
             </svg>
             Generate
           </div>
-          <div role="button" tabindex="0" id="nav-templates" class="active">
+          <div role="button" tabindex="0" id="nav-templates">
             <svg
               width="16"
               height="16"
@@ -83,6 +85,10 @@
             </svg>
             Templates
           </div>
+          <div role="button" tabindex="0" id="nav-gallery">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9A2.25 2.25 0 0 0 13.5 5.25h-9a2.25 2.25 0 0 0-2.25 2.25v9A2.25 2.25 0 0 0 4.5 18.75Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Veo Gallery
+          </div>
           <div role="button" tabindex="0" id="nav-library">
             <svg
               width="16"
@@ -102,12 +108,15 @@
             Library
           </div>
         </nav>
+        <button id="settings-button" aria-label="Settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.5.5 0 0 0 .11-.63l-1.8-3.12a.5.5 0 0 0-.61-.22l-2.39 1.02a7.6 7.6 0 0 0-1.64-.94l-.38-2.61a.5.5 0 0 0-.5-.44H9.74a.5.5 0 0 0-.5.44l-.38 2.61a7.6 7.6 0 0 0-1.64.94l-2.39-1.02a.5.5 0 0 0-.61.22l-1.8 3.12a.5.5 0 0 0 .11.63l2.03 1.58c-.05.3-.07.64-.07.94s.02.64.07.94l-2.03 1.58a.5.5 0 0 0-.11.63l1.8 3.12a.5.5 0 0 0 .61.22l2.39-1.02a7.6 7.6 0 0 0 1.64.94l.38 2.61a.5.5 0 0 0 .5.44h4.52a.5.5 0 0 0 .5-.44l.38-2.61a7.6 7.6 0 0 0 1.64.94l2.39 1.02a.5.5 0 0 0 .61-.22l1.8-3.12a.5.5 0 0 0-.11-.63l-2.03-1.58zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="currentColor"></path></svg>
+        </button>
       </div>
     </header>
 
     <main>
       <!-- Generate View -->
-      <div id="generate-view" class="hidden">
+      <div id="generate-view">
         <div class="main-header">
           <h1>Create Amazing Videos with AI</h1>
           <p>
@@ -166,7 +175,7 @@
                         <h3>Upload Image</h3>
                     </div>
                     <label for="file-input" class="file-label">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.2 15c.7-1.2 1-2.5.7-3.9-.2-1.2-.8-2.3-1.7-3.1-.9-.8-2-1.3-3.2-1.5-1.2-.2-2.5 0-3.6.6M12.5 5.5l-3-3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 14.5c.7 1.2 1 2.5.7 3.9-.2 1.2-.8 2.3-1.7 3.1-.9.8-2 1.3-3.2 1.5-1.2.2-2.5 0-3.6-.6M12 21.5l-3-3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 9 9 9 9 0 0 1-9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21.2 15c.7-1.2 1-2.5.7-3.9-.2-1.2-.8-2.3-1.7-3.1-.9-.8-2-1.3-3.2-1.5-1.2-.2-2.5 0-3.6.6M12.5 5.5l-3-3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 14.5c.7 1.2 1 2.5.7 3.9-.2 1.2-.8 2.3-1.7 3.1-.9.8-2 1.3-3.2-1.5-1.2.2-2.5 0-3.6-.6M12 21.5l-3-3-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 9 9 9 9 0 0 1-9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         <span>Click to upload or drag & drop</span>
                         <small>PNG, JPG, WEBP (max 10MB)</small>
                     </label>
@@ -179,8 +188,14 @@
                 <!-- Video Description Section -->
                 <div class="panel-section">
                   <div class="panel-section-header">
-                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                     <h3>Video Description</h3>
+                    <div class="header-content">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <h3>Video Description</h3>
+                    </div>
+                    <button id="get-ideas-button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 22a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2zm6-3H6c-1.1 0-2-.9-2-2v-1a1 1 0 0 1 2 0v1h12v-1a1 1 0 0 1 2 0v1c0 1.1-.9 2-2 2zm-6-2c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm1-11.95V4a1 1 0 0 1-2 0v1.05C7.95 5.56 5.56 7.95 5.05 11H4a1 1 0 0 0 0 2h1.05c.51 3.05 2.9 5.44 5.95 5.95V20a1 1 0 0 0 2 0v-1.05c3.05-.51 5.44-2.9 5.95-5.95H20a1 1 0 0 0 0-2h-1.05c-.51-3.05-2.9-5.44-5.95-5.95z" fill="currentColor"/></svg>
+                        Get Ideas
+                    </button>
                   </div>
                   <textarea
                     id="prompt-input"
@@ -194,7 +209,7 @@
                 <!-- Settings Section -->
                 <div class="panel-section">
                   <div class="panel-section-header">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.5.5 0 0 0 .11-.63l-1.8-3.12a.5.5 0 0 0-.61-.22l-2.39 1.02a7.6 7.6 0 0 0-1.64-.94l-.38-2.61a.5.5 0 0 0-.5-.44H9.74a.5.5 0 0 0-.5.44l-.38 2.61a7.6 7.6 0 0 0-1.64.94l-2.39-1.02a.5.5 0 0 0-.61.22l-1.8 3.12a.5.5 0 0 0 .11.63l2.03 1.58c-.05.3-.07.64-.07.94s.02.64.07.94l-2.03 1.58a.5.5 0 0 0-.11.63l1.8 3.12a.5.5 0 0 0 .61.22l2.39-1.02a7.6 7.6 0 0 0 1.64.94l.38 2.61a.5.5 0 0 0 .5.44h4.52a.5.5 0 0 0 .5-.44l.38-2.61a7.6 7.6 0 0 0 1.64-.94l2.39 1.02a.5.5 0 0 0 .61-.22l1.8-3.12a.5.5 0 0 0-.11-.63l-2.03-1.58zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="currentColor"/></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.5.5 0 0 0 .11-.63l-1.8-3.12a.5.5 0 0 0-.61-.22l-2.39 1.02a7.6 7.6 0 0 0-1.64-.94l-.38-2.61a.5.5 0 0 0-.5-.44H9.74a.5.5 0 0 0-.5.44l-.38 2.61a7.6 7.6 0 0 0-1.64.94l-2.39-1.02a.5.5 0 0 0-.61.22l-1.8 3.12a.5.5 0 0 0 .11.63l2.03 1.58c-.05.3-.07.64-.07.94s.02.64.07.94l-2.03 1.58a.5.5 0 0 0-.11.63l1.8 3.12a.5.5 0 0 0 .61.22l2.39-1.02a7.6 7.6 0 0 0 1.64.94l.38 2.61a.5.5 0 0 0 .5.44h4.52a.5.5 0 0 0 .5-.44l.38-2.61a7.6 7.6 0 0 0 1.64.94l2.39 1.02a.5.5 0 0 0 .61-.22l1.8-3.12a.5.5 0 0 0-.11-.63l-2.03-1.58zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="currentColor"/></svg>
                     <h3>Settings</h3>
                   </div>
                   <div class="settings-section">
@@ -268,12 +283,17 @@
                   </p>
                 </div>
                 <div id="placeholder-generating-state" class="hidden">
-                  <p id="progress-percent">0%</p>
-                  <p id="progress-stage">Initializing...</p>
-                  <div id="progress-bar-container">
-                    <div id="progress-bar"></div>
-                  </div>
-                  <small>Generation can take several minutes...</small>
+                    <div id="live-preview-container">
+                        <img id="live-preview-image" src="" alt="Live video preview" />
+                    </div>
+                    <div id="progress-overlay">
+                        <p id="progress-percent">0%</p>
+                        <p id="progress-stage">Initializing...</p>
+                        <div id="progress-bar-container">
+                            <div id="progress-bar"></div>
+                        </div>
+                        <small>Generation can take several minutes...</small>
+                    </div>
                 </div>
               </div>
               <video id="video" controls></video>
@@ -348,84 +368,89 @@
       </div>
 
       <!-- Templates View -->
-      <div id="templates-view">
+      <div id="templates-view" class="hidden">
         <div class="main-header">
           <h1>Choose Your Video Style</h1>
-          <p>Select a template to get started with professionally crafted video styles</p>
+          <p>Select a template to get started with a pre-defined style and musical theme.</p>
         </div>
         <div class="templates-grid">
-           <!-- Template Cards -->
-           <div role="button" tabindex="0" class="template-card" data-style="Cinematic" data-music="cinematic">
-             <div class="card-image">
-               <img src="https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Cinematic style preview">
-             </div>
-             <div class="card-content">
-               <h4>Cinematic Style</h4>
-               <p>Film-like quality with dramatic lighting and sweeping camera movements. Includes a cinematic musical score.</p>
-               <span class="select-style-btn">Select Style</span>
-             </div>
-           </div>
-           <div role="button" tabindex="0" class="template-card" data-style="Nature" data-music="ambient">
-             <div class="card-image">
-               <img src="https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Nature style preview">
-             </div>
-             <div class="card-content">
-               <h4>Nature Documentary</h4>
-               <p>Breathtaking videos of natural landscapes and wildlife with stunning detail. Includes a calm, ambient soundtrack.</p>
+            <!-- Template Cards -->
+            <div role="button" tabindex="0" class="template-card" data-style="Cinematic" data-music="cinematic">
+                <div class="card-image">
+                <img src="https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Cinematic style preview">
+                </div>
+                <div class="card-content">
+                <h4>Cinematic Style</h4>
+                <p>Film-like quality with dramatic lighting and sweeping camera movements. Includes a cinematic musical score.</p>
                 <span class="select-style-btn">Select Style</span>
-             </div>
-           </div>
-           <div role="button" tabindex="0" class="template-card" data-style="Abstract" data-music="electronic">
-             <div class="card-image">
-               <img src="https://images.pexels.com/photos/1287145/pexels-photo-1287145.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Abstract style preview">
-             </div>
-             <div class="card-content">
-               <h4>Abstract Visuals</h4>
-               <p>Artistic videos focusing on color, shape, and form. Includes an upbeat electronic music track.</p>
+                </div>
+            </div>
+            <div role="button" tabindex="0" class="template-card" data-style="Nature" data-music="ambient">
+                <div class="card-image">
+                <img src="https://images.pexels.com/photos/167699/pexels-photo-167699.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Nature style preview">
+                </div>
+                <div class="card-content">
+                <h4>Nature Documentary</h4>
+                <p>Breathtaking videos of natural landscapes and wildlife with stunning detail. Includes a calm, ambient soundtrack.</p>
                 <span class="select-style-btn">Select Style</span>
-             </div>
-           </div>
+                </div>
+            </div>
+            <div role="button" tabindex="0" class="template-card" data-style="Abstract" data-music="electronic">
+                <div class="card-image">
+                <img src="https://images.pexels.com/photos/1287145/pexels-photo-1287145.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Abstract style preview">
+                </div>
+                <div class="card-content">
+                <h4>Abstract Visuals</h4>
+                <p>Artistic videos focusing on color, shape, and form. Includes an upbeat electronic music track.</p>
+                <span class="select-style-btn">Select Style</span>
+                </div>
+            </div>
             <div role="button" tabindex="0" class="template-card" data-style="Portrait" data-music="ambient">
-             <div class="card-image">
+                <div class="card-image">
                 <img src="https://images.pexels.com/photos/3779760/pexels-photo-3779760.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Portrait style preview">
-             </div>
-             <div class="card-content">
-               <h4>Character Portrait</h4>
-               <p>Detailed and expressive character shots, perfect for compelling narratives. Includes a calm, ambient soundtrack.</p>
+                </div>
+                <div class="card-content">
+                <h4>Character Portrait</h4>
+                <p>Detailed and expressive character shots, perfect for compelling narratives. Includes a calm, ambient soundtrack.</p>
                 <span class="select-style-btn">Select Style</span>
-             </div>
-           </div>
-           <div role="button" tabindex="0" class="template-card" data-style="Retro Futurism" data-music="electronic">
-             <div class="card-image">
-               <img src="https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Retro Futurism style preview">
-             </div>
-             <div class="card-content">
-               <h4>Retro Futurism</h4>
-               <p>Classic 80s sci-fi aesthetic with neon grids, synthwave vibes, and vintage electronics. Includes an upbeat electronic soundtrack.</p>
-               <span class="select-style-btn">Select Style</span>
-             </div>
-           </div>
-           <div role="button" tabindex="0" class="template-card" data-style="Dreamy Animation" data-music="ambient">
-             <div class="card-image">
-               <img src="https://images.pexels.com/photos/2098007/pexels-photo-2098007.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Dreamy Animation style preview">
-             </div>
-             <div class="card-content">
-               <h4>Dreamy Animation</h4>
-               <p>Soft, painterly visuals with a dream-like quality, reminiscent of classic anime films. Includes a calm, ambient soundtrack.</p>
+                </div>
+            </div>
+            <div role="button" tabindex="0" class="template-card" data-style="Retro Futurism" data-music="electronic">
+                <div class="card-image">
+                <img src="https://images.pexels.com/photos/1638280/pexels-photo-1638280.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Retro Futurism style preview">
+                </div>
+                <div class="card-content">
+                <h4>Retro Futurism</h4>
+                <p>Classic 80s sci-fi aesthetic with neon grids, synthwave vibes, and vintage electronics. Includes an upbeat electronic soundtrack.</p>
                 <span class="select-style-btn">Select Style</span>
-             </div>
-           </div>
-           <div role="button" tabindex="0" class="template-card" data-style="Minimalist Architecture" data-music="ambient">
-             <div class="card-image">
-               <img src="https://images.pexels.com/photos/2249962/pexels-photo-2249962.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Minimalist Architecture style preview">
-             </div>
-             <div class="card-content">
-               <h4>Minimalist Architecture</h4>
-               <p>A focus on clean lines, stark geometric shapes, and dramatic shadows in modern structures. Includes a calm, ambient soundtrack.</p>
+                </div>
+            </div>
+            <div role="button" tabindex="0" class="template-card" data-style="Dreamy Animation" data-music="ambient">
+                <div class="card-image">
+                <img src="https://images.pexels.com/photos/2098007/pexels-photo-2098007.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Dreamy Animation style preview">
+                </div>
+                <div class="card-content">
+                <h4>Dreamy Animation</h4>
+                <p>Soft, painterly visuals with a dream-like quality, reminiscent of classic anime films. Includes a calm, ambient soundtrack.</p>
                 <span class="select-style-btn">Select Style</span>
-             </div>
-           </div>
+                </div>
+            </div>
+            <div role="button" tabindex="0" class="template-card" data-style="Minimalist Architecture" data-music="ambient">
+                <div class="card-image">
+                <img src="https://images.pexels.com/photos/2249962/pexels-photo-2249962.jpeg?auto=compress&cs=tinysrgb&w=600" alt="Minimalist Architecture style preview">
+                </div>
+                <div class="card-content">
+                <h4>Minimalist Architecture</h4>
+                <p>A focus on clean lines, stark geometric shapes, and dramatic shadows in modern structures. Includes a calm, ambient soundtrack.</p>
+                <span class="select-style-btn">Select Style</span>
+                </div>
+            </div>
         </div>
+      </div>
+
+      <!-- Veo Gallery View -->
+      <div id="gallery-view" class="hidden">
+        <div id="veo-gallery-root"></div>
       </div>
 
       <!-- Library View -->
@@ -451,21 +476,59 @@
       </div>
     </main>
     
+    <!-- API Key Modal -->
+    <div id="api-key-modal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <h3>Configure API Key</h3>
+        <p>
+          Please enter your Google Gemini API key to use the app. Your key will be stored locally in your browser and is never shared. You can get a key from
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">AI Studio</a>.
+        </p>
+        <input type="password" id="api-key-input" placeholder="Enter your API key" />
+        <div class="modal-actions">
+          <button id="cancel-api-key-button" class="secondary">Cancel</button>
+          <button id="save-api-key-button">Save Key</button>
+        </div>
+      </div>
+    </div>
+    
     <!-- Custom Prompt Modal -->
     <div id="custom-prompt-modal" class="modal-overlay hidden">
       <div class="modal-content">
-        <h3>Define Custom Video Style</h3>
+        <h3>Custom Style Prompt</h3>
         <p>
-          Enter your own style prompt below. Be descriptive for the best results.
+          Enter your own style description. This will be prepended to your main video description.
         </p>
-        <textarea id="custom-prompt-input" rows="4" placeholder="e.g., vaporwave aesthetic, gritty black and white film, 1980s sci-fi movie..."></textarea>
+        <textarea id="custom-prompt-input" rows="3" placeholder="e.g., in the style of a vintage documentary..."></textarea>
         <div class="modal-actions">
-           <button id="cancel-custom-prompt-button" class="secondary">Cancel</button>
-           <button id="save-custom-prompt-button">Save Style</button>
+          <button id="cancel-custom-prompt-button" class="secondary">Cancel</button>
+          <button id="save-custom-prompt-button">Save Style</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Idea Generator Modal -->
+    <div id="idea-generator-modal" class="modal-overlay hidden">
+      <div class="modal-content large">
+        <h3>Generate Video Ideas</h3>
+        <p>
+          Enter a theme or keyword, and we'll generate some creative video prompts for you.
+        </p>
+        <div class="idea-input-group">
+          <input type="text" id="idea-theme-input" placeholder="e.g., 'cosmic exploration', 'tiny forest creatures'"/>
+          <button id="generate-ideas-button">
+            <span class="spinner"></span>
+            <span class="button-label">Generate</span>
+          </button>
+        </div>
+        <div id="idea-results-container">
+          <!-- Generated idea cards will be injected here -->
+        </div>
+        <div class="modal-actions">
+          <button id="cancel-idea-modal-button" class="secondary">Close</button>
         </div>
       </div>
     </div>
 
-    <script type="module" src="index.tsx"></script>
   </body>
 </html>
