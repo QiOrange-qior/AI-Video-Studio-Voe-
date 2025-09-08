@@ -10,9 +10,6 @@
 import { GoogleGenAI, Type } from '@google/genai';
 // Fix: Removed static FFmpeg imports to prevent app load failures. They are now imported dynamically.
 import '@tailwindcss/browser';
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { App as VeoGalleryApp } from './Veo gallery/Veo gallery App.tsx';
 
 interface VideoParams {
   aspectRatio?: string;
@@ -204,11 +201,9 @@ async function generateContent(
 // --- DOM Elements ---
 let generateView: HTMLDivElement,
     templatesView: HTMLDivElement,
-    galleryView: HTMLDivElement,
     libraryView: HTMLDivElement,
     navGenerate: HTMLDivElement,
     navTemplates: HTMLDivElement,
-    navGallery: HTMLDivElement,
     navLibrary: HTMLDivElement,
     promptEl: HTMLTextAreaElement,
     statusEl: HTMLParagraphElement,
@@ -277,11 +272,9 @@ let generateView: HTMLDivElement,
 function initializeDOMElements() {
     generateView = document.querySelector('#generate-view') as HTMLDivElement;
     templatesView = document.querySelector('#templates-view') as HTMLDivElement;
-    galleryView = document.querySelector('#gallery-view') as HTMLDivElement;
     libraryView = document.querySelector('#library-view') as HTMLDivElement;
     navGenerate = document.querySelector('#nav-generate') as HTMLDivElement;
     navTemplates = document.querySelector('#nav-templates') as HTMLDivElement;
-    navGallery = document.querySelector('#nav-gallery') as HTMLDivElement;
     navLibrary = document.querySelector('#nav-library') as HTMLDivElement;
     promptEl = document.querySelector('#prompt-input') as HTMLTextAreaElement;
     statusEl = document.querySelector('#status') as HTMLParagraphElement;
@@ -354,7 +347,6 @@ function initializeDOMElements() {
       audioSwitch,
       navGenerate,
       navTemplates,
-      navGallery,
       navLibrary,
       textToVideoTab,
       imageToVideoTab,
@@ -471,16 +463,14 @@ function setActiveButton(buttons: NodeListOf<Element>, selectedButton: Element) 
   selectedButton.classList.add('active');
 }
 
-function showView(viewId: 'generate' | 'templates' | 'gallery' | 'library') {
-  if (!generateView || !templatesView || !galleryView || !libraryView || !navGenerate || !navTemplates || !navGallery || !navLibrary) return;
+function showView(viewId: 'generate' | 'templates' | 'library') {
+  if (!generateView || !templatesView || !libraryView || !navGenerate || !navTemplates || !navLibrary) return;
 
   generateView.classList.add('hidden');
   templatesView.classList.add('hidden');
-  galleryView.classList.add('hidden');
   libraryView.classList.add('hidden');
   navGenerate.classList.remove('active');
   navTemplates.classList.remove('active');
-  navGallery.classList.remove('active');
   navLibrary.classList.remove('active');
 
   switch (viewId) {
@@ -491,11 +481,6 @@ function showView(viewId: 'generate' | 'templates' | 'gallery' | 'library') {
     case 'templates':
       templatesView.classList.remove('hidden');
       navTemplates.classList.add('active');
-      break;
-    case 'gallery':
-      galleryView.classList.remove('hidden');
-      navGallery.classList.add('active');
-      initializeVeoGalleryApp();
       break;
     case 'library':
       libraryView.classList.remove('hidden');
@@ -542,28 +527,6 @@ async function createThumbnail(videoElement: HTMLVideoElement): Promise<Blob> {
     }
   });
 }
-
-// --- Veo Gallery Showcase ---
-let galleryInitialized = false;
-function initializeVeoGalleryApp() {
-    if (galleryInitialized) return;
-
-    const galleryRoot = document.getElementById('veo-gallery-root');
-    if (galleryRoot) {
-        const root = ReactDOM.createRoot(galleryRoot);
-        const galleryProps = {
-          getApiKey: () => apiKey,
-          openApiKeyModal: () => openApiKeyModal(false)
-        };
-        root.render(
-            React.createElement(React.StrictMode, null, React.createElement(VeoGalleryApp, galleryProps))
-        );
-        galleryInitialized = true;
-    } else {
-        console.error('Could not find root element for Veo Gallery App.');
-    }
-}
-
 
 // --- Library Functions ---
 async function loadVideosFromLibrary() {
@@ -751,7 +714,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (navGenerate) navGenerate.addEventListener('click', () => showView('generate'));
   if (navTemplates) navTemplates.addEventListener('click', () => showView('templates'));
-  if (navGallery) navGallery.addEventListener('click', () => showView('gallery'));
   if (navLibrary) navLibrary.addEventListener('click', () => showView('library'));
 
   if (sortSelect) {
@@ -804,6 +766,13 @@ document.addEventListener('DOMContentLoaded', () => {
             setActiveButton(styleButtons, button);
             selectedStylePrefix = (button as HTMLElement).dataset.style || '';
             customStyleValue = '';
+            // Reset custom prompt button text
+            if (customPromptButton) {
+                const customPromptP = customPromptButton.querySelector('p');
+                if (customPromptP) {
+                    customPromptP.textContent = 'Write your own description';
+                }
+            }
         });
     });
   }
@@ -853,11 +822,26 @@ document.addEventListener('DOMContentLoaded', () => {
           setActiveButton(styleButtons, styleButton);
           selectedStylePrefix = style;
           customStyleValue = '';
+          // Reset custom prompt button text
+          if (customPromptButton) {
+              const customPromptP = customPromptButton.querySelector('p');
+              if (customPromptP) {
+                  customPromptP.textContent = 'Write your own description';
+              }
+          }
         } else if (customPromptButton) {
           // Fallback to custom if no direct button match
           setActiveButton(styleButtons, customPromptButton);
           selectedStylePrefix = '';
           customStyleValue = style;
+          // Update custom prompt button text
+          const customPromptP = customPromptButton.querySelector('p');
+          if (customPromptP) {
+              const maxLength = 35;
+              customPromptP.textContent = style.length > maxLength 
+                  ? style.substring(0, maxLength) + '...' 
+                  : style;
+          }
         }
 
         // Set background music
@@ -1177,6 +1161,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newStyle && customPromptButton) {
           customStyleValue = newStyle;
           setActiveButton(styleButtons, customPromptButton);
+          // Update the custom prompt button's text to show the new style
+          const customPromptP = customPromptButton.querySelector('p');
+          if (customPromptP) {
+              const maxLength = 35; // Max characters before truncating
+              customPromptP.textContent = newStyle.length > maxLength 
+                  ? newStyle.substring(0, maxLength) + '...' 
+                  : newStyle;
+          }
         }
       }
       closeCustomPromptModal();
@@ -1295,7 +1287,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Add keyboard accessibility to div 'buttons'
-  const clickableDivs = document.querySelectorAll<HTMLDivElement>('#nav-generate, #nav-templates, #nav-gallery, #nav-library, .tab-button, .template-card, .style-option, .format-option, .music-option');
+  const clickableDivs = document.querySelectorAll<HTMLDivElement>('#nav-generate, #nav-templates, #nav-library, .tab-button, .template-card, .style-option, .format-option, .music-option');
   clickableDivs.forEach(div => {
       div.addEventListener('keydown', (e: KeyboardEvent) => {
           if (e.key === 'Enter' || e.key === ' ') {
